@@ -17,7 +17,7 @@ func (c *Cache) LoadFromFile() error {
 
 	dec := gob.NewDecoder(f)
 	for {
-		var k, v interface{}
+		var k, v interface{}  
 
 		err := dec.Decode(&k)
 		if err == io.EOF {
