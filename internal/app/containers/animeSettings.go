@@ -2,6 +2,11 @@ package containers
 
 import "github.com/rivo/tview"
 
-func NewAnimeSettings() *tview.Box {
-	return tview.NewBox().SetTitle("Озвучка/Источник").SetBorder(true)
+func NewAnimeSettings() *tview.DropDown {
+	dropdown := tview.NewDropDown()
+	dropdown.SetBorder(true)
+	dropdown.SetTitle("Озвучка/Источник")
+	dropdown.AddOption("Anilibria", nil)
+	dropdown.AddOption("RHS", nil)
+	return dropdown
 }

@@ -3,14 +3,15 @@ package animego
 import (
 	"anigo/internal/extractors"
 	"io"
+	"log"
 	"net/http"
 	"strings"
 
 	"github.com/PuerkitoBio/goquery"
 )
 
-func (a *Animego) Search(query string) ([]extractors.AnimeInfo, error) {
-	url := a.BaseURL + "/search/anime?q=" + query
+func (a *Animego) Search(query string) ([]extractors.Anime, error) {
+	url := a.BaseURL + "/search/anime?q=" + strings.ReplaceAll(query, " ", "+")
 
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
@@ -19,23 +20,27 @@ func (a *Animego) Search(query string) ([]extractors.AnimeInfo, error) {
 	req.Header.Set("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36")
 	req.Header.Set("Accept-Language", "ru-RU,ru;q=0.9")
 
-	client := &http.Client{}
-	resp, err := client.Do(req)
+	resp, err := a.httpClient.Do(req)
 	if err != nil {
 		return nil, err
+	}
+	if resp.StatusCode != http.StatusOK {
+		log.Printf("not ok status in search (%v)", resp.StatusCode)
+		body, _ := io.ReadAll(resp.Body)
+		log.Printf("body:\n%v", string(body))
 	}
 	defer resp.Body.Close()
 
 	return a.parseAnimeList(resp.Body)
 }
 
-func (a *Animego) parseAnimeList(r io.Reader) ([]extractors.AnimeInfo, error) {
+func (a *Animego) parseAnimeList(r io.Reader) ([]extractors.Anime, error) {
 	doc, err := goquery.NewDocumentFromReader(r)
 	if err != nil {
 		return nil, err
 	}
 
-	var results []extractors.AnimeInfo
+	var results []extractors.Anime
 
 	doc.Find("div.ani-grid__item").Each(func(_ int, s *goquery.Selection) {
 		// Название и URL из <a> внутри ani-grid__item-title
@@ -53,7 +58,7 @@ func (a *Animego) parseAnimeList(r io.Reader) ([]extractors.AnimeInfo, error) {
 			return
 		}
 
-		results = append(results, extractors.AnimeInfo{
+		results = append(results, extractors.Anime{
 			Title:  title,
 			Rating: rating,
 			URL:    href,
