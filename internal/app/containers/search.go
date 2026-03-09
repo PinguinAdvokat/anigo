@@ -9,10 +9,6 @@ func NewSearch() (*tview.InputField, *tview.List, *tview.Flex) {
 
 	search := tview.NewList()
 	search.ShowSecondaryText(false)
-	search.
-		AddItem("аниме 1", "", 0, nil).
-		AddItem("аниме 2", "", 0, nil).
-		AddItem("аниме 3", "", 0, nil)
 
 	flex := tview.NewFlex()
 	flex.SetBorder(true)

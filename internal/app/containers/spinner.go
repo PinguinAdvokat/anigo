@@ -24,7 +24,7 @@ func NewSpinner(app interface {
 			select {
 			case <-ticker.C:
 				app.QueueUpdateDraw(func() {
-					textView.SetText(fmt.Sprintf("[ %s ] Загрузка...", symbols[i%len(symbols)]))
+					textView.SetText(fmt.Sprintf("[%s] Загрузка...", symbols[i%len(symbols)]))
 				})
 				i = (i + 1) % len(symbols)
 

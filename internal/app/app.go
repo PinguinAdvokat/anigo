@@ -42,8 +42,8 @@ func (a *App) Search() {
 		}
 		a.SearchList.Clear()
 		if len(a.Manager.FoundAnime) != 0 {
-			for id, anime := range a.Manager.FoundAnime {
-				a.SearchList.AddItem(fmt.Sprintf("[%d] %s", id, anime.Title), "", 0, nil)
+			for _, anime := range a.Manager.FoundAnime {
+				a.SearchList.AddItem(fmt.Sprintf("[%s] %s", anime.Rating, anime.Title), "", 0, nil)
 			}
 		} else {
 			a.SearchList.AddItem("Ничего не найдено", "", 0, nil)

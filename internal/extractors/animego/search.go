@@ -57,6 +57,9 @@ func (a *Animego) parseAnimeList(r io.Reader) ([]extractors.Anime, error) {
 		if title == "" {
 			return
 		}
+		if rating == "" {
+			rating = "---"
+		}
 
 		results = append(results, extractors.Anime{
 			Title:  title,
