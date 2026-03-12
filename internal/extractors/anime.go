@@ -17,3 +17,7 @@ type Episode struct {
 	Name      string
 	SourceURL string
 }
+
+var (
+	AvailablePlayers = []string{"Kodik"}
+)
