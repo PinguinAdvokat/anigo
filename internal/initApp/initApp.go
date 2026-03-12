@@ -23,7 +23,7 @@ func Init() string {
 	_, err := exec.LookPath("mpv")
 	if err != nil {
 		fmt.Print("Cant find mpv player\n")
-		os.Exit(0)
+		//os.Exit(0)
 	}
 	appDir := dataDir("anigo")
 	err = os.MkdirAll(appDir, 0755)

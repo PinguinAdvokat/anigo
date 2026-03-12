@@ -3,8 +3,8 @@ package app
 import (
 	"anigo/internal/app/containers"
 	"anigo/internal/manager"
-	"fmt"
 	"log"
+	"time"
 
 	"github.com/gdamore/tcell/v2"
 	"github.com/rivo/tview"
@@ -19,7 +19,9 @@ type App struct {
 	Library       *tview.List
 	EpisodeSelect *tview.List
 	Preview       *tview.Flex
-	AnimeSettings *tview.DropDown
+	AnimeSettings *tview.Flex
+	Voiceover     *tview.DropDown
+	Player        *tview.DropDown
 	Quality       *tview.DropDown
 
 	SearchFlex *tview.Flex
@@ -29,41 +31,10 @@ type App struct {
 	Manager *manager.Manager
 }
 
-func (a *App) Search() {
-	stopCh := make(chan struct{})
-	spinner := containers.NewSpinner(a, stopCh)
-	a.setSearchContent(spinner)
-	go func() {
-		err := a.Manager.Search(a.SearchInput.GetText())
-		if err != nil {
-			stopCh <- struct{}{}
-			spinner.SetText(fmt.Sprintf("Ошибка при поиске: %v", err))
-			a.Draw()
-		}
-		a.SearchList.Clear()
-		if len(a.Manager.FoundAnime) != 0 {
-			for _, anime := range a.Manager.FoundAnime {
-				a.SearchList.AddItem(fmt.Sprintf("[%s] %s", anime.Rating, anime.Title), "", 0, nil)
-			}
-		} else {
-			a.SearchList.AddItem("Ничего не найдено", "", 0, nil)
-		}
-		stopCh <- struct{}{}
-		close(stopCh)
-		a.setSearchContent(a.SearchList)
-		a.Draw()
-	}()
-}
-
-func (a *App) setSearchContent(prim tview.Primitive) {
-	a.SearchFlex.Clear()
-	a.SearchFlex.SetDirection(tview.FlexRow).
-		AddItem(a.SearchInput, 3, 1, true).
-		AddItem(prim, 0, 1, false)
-}
-
 func New(manager *manager.Manager) *App {
 	input, searchList, searchFlex := containers.NewSearch()
+
+	voicecover, player, animeSettingsFlex := containers.NewAnimeSettings()
 	a := &App{
 		Application: *tview.NewApplication(),
 
@@ -73,7 +44,9 @@ func New(manager *manager.Manager) *App {
 		Library:       containers.NewLibrary(),
 		EpisodeSelect: containers.NewEpisodeSelect(),
 		Preview:       containers.NewPreview(),
-		AnimeSettings: containers.NewAnimeSettings(),
+		AnimeSettings: animeSettingsFlex,
+		Voiceover:     voicecover,
+		Player:        player,
 		Quality:       containers.NewQuality(),
 
 		SearchFlex: searchFlex,
@@ -125,6 +98,16 @@ func New(manager *manager.Manager) *App {
 		if key == tcell.KeyEnter {
 			a.Search()
 		}
+	})
+
+	// Getting anime info on selected
+	a.SearchList.SetChangedFunc(func(index int, mainText, secondaryText string, shortcut rune) {
+		go func() {
+			time.Sleep(time.Millisecond * 300)
+			if a.SearchList.GetCurrentItem() == index {
+				a.GetAnimeInfo(index)
+			}
+		}()
 	})
 
 	log.SetOutput(a.Preview.GetItem(0).(*tview.TextView))

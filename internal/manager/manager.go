@@ -8,6 +8,7 @@ import (
 
 type Extractor interface {
 	Search(string) ([]extractors.Anime, error)
+	ParseAnime(extractors.Anime) (extractors.Anime, error)
 }
 
 type Manager struct {
@@ -31,4 +32,14 @@ func (m *Manager) Search(name string) error {
 	m.FoundAnime = animes
 	m.mu.Unlock()
 	return err
+}
+
+func (m *Manager) ParseAnime(animeIndex int) error {
+	parsedAnime, err := m.Extractor.ParseAnime(m.FoundAnime[animeIndex])
+	if err != nil {
+		log.Printf("manager failed in parsing anime: %v\n", err)
+		return err
+	}
+	m.FoundAnime[animeIndex] = parsedAnime
+	return nil
 }

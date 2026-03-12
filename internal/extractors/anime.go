@@ -1,14 +1,19 @@
 package extractors
 
 type Anime struct {
-	Title         string
-	Rating        string
-	URL           string
-	EpisodesCount int
-	Episodes      []Episode
+	Title              string
+	Description        string
+	Rating             string
+	URL                string
+	AvailableVoiceover []string
+	AvailablePlayers   []string
+	SelectedVoiceover  []string
+	SelectedSource     []string
+	EpisodesCount      int
+	Episodes           []Episode
 }
 
 type Episode struct {
-	Name     string
-	KodikURL string
+	Name      string
+	SourceURL string
 }

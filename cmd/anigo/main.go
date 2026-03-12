@@ -19,7 +19,6 @@ func main() {
 	flag.Parse()
 
 	if !*verbose {
-		// все log.Print, log.Printf и т.п. будут "тихими"
 		log.SetOutput(io.Discard)
 	}
 
@@ -31,7 +30,7 @@ func main() {
 	manager := manager.New(animego)
 
 	app := app.New(manager)
-	if err := app.EnableMouse(true).Run(); err != nil {
+	if err := app.EnableMouse(true).EnablePaste(true).Run(); err != nil {
 		panic(err)
 	}
 }
