@@ -9,7 +9,7 @@ import (
 
 func NewSpinner(app interface {
 	QueueUpdateDraw(func()) *tview.Application
-}, stop chan struct{}) *tview.TextView {
+}) *tview.TextView {
 	textView := tview.NewTextView().
 		SetTextAlign(tview.AlignCenter)
 
@@ -27,9 +27,6 @@ func NewSpinner(app interface {
 					textView.SetText(fmt.Sprintf("[%s] Загрузка...", symbols[i%len(symbols)]))
 				})
 				i = (i + 1) % len(symbols)
-
-			case <-stop:
-				return
 			}
 		}
 	}()

@@ -1,7 +1,6 @@
 package app
 
 import (
-	"anigo/internal/app/containers"
 	"fmt"
 	"log"
 	"runtime"
@@ -24,19 +23,16 @@ func (a *App) GetAnimeInfo(index int) {
 		return
 	}
 
-	stopCh := make(chan struct{})
-	spinner := containers.NewSpinner(a, stopCh)
-	a.setAnimeSettingsContent([]tview.Primitive{spinner})
+	a.setAnimeSettingsContent([]tview.Primitive{a.Spinner})
 	go func() {
 		err := a.Manager.ParseAnime(index)
 		if err != nil {
 			log.Printf("Failed get animeinfo: %v\n", err)
-			stopCh <- struct{}{}
-			spinner.SetText(fmt.Sprintf("Ошибка при поиске: %v", err))
+			a.ErrorView.SetText(fmt.Sprintf("Ошибка при поиске: %v", err))
+			a.setAnimeSettingsContent([]tview.Primitive{a.ErrorView})
 			a.Draw()
 			return
 		}
-		stopCh <- struct{}{}
 		a.Voiceover.SetOptions(a.Manager.FoundAnime[index].AvailableVoiceover, nil)
 		a.Player.SetOptions(a.Manager.FoundAnime[index].AvailablePlayers, nil)
 		a.setAnimeSettingsContent([]tview.Primitive{a.Voiceover, a.Player})

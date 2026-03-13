@@ -23,6 +23,8 @@ type App struct {
 	Voiceover     *tview.DropDown
 	Player        *tview.DropDown
 	Quality       *tview.DropDown
+	Spinner       *tview.TextView
+	ErrorView     *tview.TextView
 
 	SearchFlex *tview.Flex
 
@@ -48,11 +50,13 @@ func New(manager *manager.Manager) *App {
 		Voiceover:     voicecover,
 		Player:        player,
 		Quality:       containers.NewQuality(),
+		ErrorView:     containers.NewErrorView(),
 
 		SearchFlex: searchFlex,
 
 		Manager: manager,
 	}
+	a.Spinner = containers.NewSpinner(a)
 
 	// pages
 	SearchFlexPage := tview.NewFlex().SetDirection(tview.FlexColumn).
