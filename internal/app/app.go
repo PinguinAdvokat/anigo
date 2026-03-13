@@ -6,27 +6,20 @@ import (
 	"log"
 	"time"
 
-	"github.com/gdamore/tcell/v2"
 	"github.com/rivo/tview"
 )
 
 type App struct {
 	tview.Application
 
-	Menu          *tview.List
-	SearchInput   *tview.InputField
-	SearchList    *tview.List
-	Library       *tview.List
-	EpisodeSelect *tview.List
-	Preview       *tview.Flex
-	AnimeSettings *tview.Flex
-	Voiceover     *tview.DropDown
-	Player        *tview.DropDown
-	Quality       *tview.DropDown
-	Spinner       *tview.TextView
-	ErrorView     *tview.TextView
-
-	SearchFlex *tview.Flex
+	Menu            *tview.List
+	Library         *tview.List
+	SearchContainer *containers.Search
+	EpisodeSelect   *tview.List
+	Preview         *tview.Flex
+	AnimeSettings   tview.Primitive
+	Quality         *tview.DropDown
+	Spinner         *tview.TextView
 
 	Pages *tview.Pages
 
@@ -34,34 +27,26 @@ type App struct {
 }
 
 func New(manager *manager.Manager) *App {
-	input, searchList, searchFlex := containers.NewSearch()
-
-	voicecover, player, animeSettingsFlex := containers.NewAnimeSettings()
 	a := &App{
 		Application: *tview.NewApplication(),
 
-		Menu:          containers.NewMenu(),
-		SearchInput:   input,
-		SearchList:    searchList,
-		Library:       containers.NewLibrary(),
-		EpisodeSelect: containers.NewEpisodeSelect(),
-		Preview:       containers.NewPreview(),
-		AnimeSettings: animeSettingsFlex,
-		Voiceover:     voicecover,
-		Player:        player,
-		Quality:       containers.NewQuality(),
-		ErrorView:     containers.NewErrorView(),
-
-		SearchFlex: searchFlex,
+		Menu:            containers.NewMenu(),
+		Library:         containers.NewLibrary(),
+		SearchContainer: nil,
+		EpisodeSelect:   containers.NewEpisodeSelect(),
+		Preview:         containers.NewPreview(),
+		AnimeSettings:   containers.NewAnimeSettings(),
+		Quality:         containers.NewQuality(),
 
 		Manager: manager,
 	}
 	a.Spinner = containers.NewSpinner(a)
+	a.SearchContainer = containers.NewSearch(a)
 
 	// pages
 	SearchFlexPage := tview.NewFlex().SetDirection(tview.FlexColumn).
 		AddItem(a.Menu, 14, 1, true).
-		AddItem(a.SearchFlex, 0, 2, true).
+		AddItem(a.SearchContainer, 0, 2, true).
 		AddItem(tview.NewFlex().SetDirection(tview.FlexRow).
 			AddItem(a.Preview, 0, 1, true).
 			AddItem(a.AnimeSettings, 5, 1, true), 0, 1, true)
@@ -97,19 +82,12 @@ func New(manager *manager.Manager) *App {
 		}
 	})
 
-	// SearchFlex
-	a.SearchInput.SetDoneFunc(func(key tcell.Key) {
-		if key == tcell.KeyEnter {
-			a.Search()
-		}
-	})
-
 	// Getting anime info on selected
-	a.SearchList.SetChangedFunc(func(index int, mainText, secondaryText string, shortcut rune) {
+	a.SearchContainer.List.SetChangedFunc(func(index int, mainText, secondaryText string, shortcut rune) {
 		go func() {
 			time.Sleep(time.Millisecond * 300)
-			if a.SearchList.GetCurrentItem() == index {
-				a.GetAnimeInfo(index)
+			if a.SearchContainer.List.GetCurrentItem() == index {
+				log.Print()
 			}
 		}()
 	})
@@ -121,4 +99,12 @@ func New(manager *manager.Manager) *App {
 	a.SetRoot(pages, true)
 	a.SetFocus(pages)
 	return a
+}
+
+func (a *App) GetSpinner() *tview.TextView {
+	return a.Spinner
+}
+
+func (a *App) GetManager() *manager.Manager {
+	return a.Manager
 }

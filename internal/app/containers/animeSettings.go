@@ -2,17 +2,33 @@ package containers
 
 import "github.com/rivo/tview"
 
-func NewAnimeSettings() (*tview.DropDown, *tview.DropDown, *tview.Flex) {
-	voiceover := tview.NewDropDown()
-	voiceover.SetLabel("Озвучка")
+type AnimeSettings struct {
+	*tview.Flex
 
-	player := tview.NewDropDown()
-	player.SetLabel("Плеер")
+	Voiceover *tview.DropDown
+	Player    *tview.DropDown
+}
 
-	flex := tview.NewFlex()
-	flex.SetBorder(true)
-	flex.
-		AddItem(voiceover, 0, 1, true).
-		AddItem(player, 0, 1, true)
-	return voiceover, player, flex
+func NewAnimeSettings() tview.Primitive {
+	a := &AnimeSettings{
+		Flex: tview.NewFlex(),
+	}
+	a.SetDirection(tview.FlexRow)
+	a.SetBorder(true)
+
+	a.Voiceover = tview.NewDropDown()
+	a.Voiceover.SetLabel("Озвучка")
+
+	a.Player = tview.NewDropDown()
+	a.Player.SetLabel("Плеер")
+
+	a.
+		AddItem(a.Voiceover, 0, 1, true).
+		AddItem(a.Player, 0, 1, true)
+	return a
+}
+
+func (a *AnimeSettings) SetItem(item tview.Primitive) {
+	a.Clear()
+	a.AddItem(item, 0, 1, true)
 }
