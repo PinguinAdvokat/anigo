@@ -10,14 +10,14 @@ import (
 )
 
 type App struct {
-	tview.Application
+	*tview.Application
 
 	Menu            *tview.List
 	Library         *tview.List
 	SearchContainer *containers.Search
 	EpisodeSelect   *tview.List
 	Preview         *tview.Flex
-	AnimeSettings   tview.Primitive
+	AnimeSettings   *containers.AnimeSettings
 	Quality         *tview.DropDown
 	Spinner         *tview.TextView
 
@@ -28,20 +28,21 @@ type App struct {
 
 func New(manager *manager.Manager) *App {
 	a := &App{
-		Application: *tview.NewApplication(),
+		Application: tview.NewApplication(),
 
+		SearchContainer: nil,
+		AnimeSettings:   nil,
 		Menu:            containers.NewMenu(),
 		Library:         containers.NewLibrary(),
-		SearchContainer: nil,
 		EpisodeSelect:   containers.NewEpisodeSelect(),
 		Preview:         containers.NewPreview(),
-		AnimeSettings:   containers.NewAnimeSettings(),
 		Quality:         containers.NewQuality(),
 
 		Manager: manager,
 	}
 	a.Spinner = containers.NewSpinner(a)
 	a.SearchContainer = containers.NewSearch(a)
+	a.AnimeSettings = containers.NewAnimeSettings(a)
 
 	// pages
 	SearchFlexPage := tview.NewFlex().SetDirection(tview.FlexColumn).
@@ -87,7 +88,7 @@ func New(manager *manager.Manager) *App {
 		go func() {
 			time.Sleep(time.Millisecond * 300)
 			if a.SearchContainer.List.GetCurrentItem() == index {
-				log.Print()
+				a.AnimeSettings.SetAnimeSettings(index)
 			}
 		}()
 	})
