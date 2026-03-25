@@ -15,7 +15,7 @@ type App struct {
 	Menu            *tview.List
 	Library         *tview.List
 	SearchContainer *containers.Search
-	EpisodeSelect   *tview.List
+	EpisodeSelect   *containers.EpisodeSelector
 	Preview         *tview.Flex
 	AnimeSettings   *containers.AnimeSettings
 	Quality         *tview.DropDown
@@ -32,9 +32,9 @@ func New(manager *manager.Manager) *App {
 
 		SearchContainer: nil,
 		AnimeSettings:   nil,
+		EpisodeSelect:   nil,
 		Menu:            containers.NewMenu(),
 		Library:         containers.NewLibrary(),
-		EpisodeSelect:   containers.NewEpisodeSelect(),
 		Preview:         containers.NewPreview(),
 		Quality:         containers.NewQuality(),
 
@@ -43,6 +43,7 @@ func New(manager *manager.Manager) *App {
 	a.Spinner = containers.NewSpinner(a)
 	a.SearchContainer = containers.NewSearch(a)
 	a.AnimeSettings = containers.NewAnimeSettings(a)
+	a.EpisodeSelect = containers.NewEpisodeSelect(a)
 
 	// pages
 	SearchFlexPage := tview.NewFlex().SetDirection(tview.FlexColumn).
@@ -91,6 +92,13 @@ func New(manager *manager.Manager) *App {
 				a.AnimeSettings.SetAnimeSettings(index)
 			}
 		}()
+	})
+
+	// EpisodeSelector
+	a.SearchContainer.List.SetSelectedFunc(func(i int, s1, s2 string, r rune) {
+		log.Print("switch to anime")
+		a.Pages.SwitchToPage("anime")
+		a.EpisodeSelect.SetEpisodes(i)
 	})
 
 	log.SetOutput(a.Preview.GetItem(0).(*tview.TextView))
