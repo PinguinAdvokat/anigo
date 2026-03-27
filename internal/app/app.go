@@ -89,6 +89,8 @@ func New(manager *manager.Manager) *App {
 		go func() {
 			time.Sleep(time.Millisecond * 300)
 			if a.SearchContainer.List.GetCurrentItem() == index {
+				log.Print("setanimesettings")
+				a.Draw()
 				a.AnimeSettings.SetAnimeSettings(index)
 			}
 		}()
@@ -96,9 +98,10 @@ func New(manager *manager.Manager) *App {
 
 	// EpisodeSelector
 	a.SearchContainer.List.SetSelectedFunc(func(i int, s1, s2 string, r rune) {
-		log.Print("switch to anime")
-		a.Pages.SwitchToPage("anime")
-		a.EpisodeSelect.SetEpisodes(i)
+		if a.Manager.FoundAnime[i].Parsed {
+			a.EpisodeSelect.SetEpisodes(i)
+			a.Pages.SwitchToPage("anime")
+		}
 	})
 
 	log.SetOutput(a.Preview.GetItem(0).(*tview.TextView))

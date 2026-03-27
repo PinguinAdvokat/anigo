@@ -55,9 +55,10 @@ func (a *Animego) ParseAnime(anime extractors.Anime) (extractors.Anime, error) {
 		return extractors.Anime{}, fmt.Errorf("fetch page: %w", err)
 	}
 
+	// base anime info (voicecovers, players, episodes count)
 	anime = parseBody(anime, body)
 
-	// fetch players
+	// get anime id
 	re := regexp.MustCompile(`\d+$`)
 	match := re.FindString(pageURL)
 
@@ -67,19 +68,44 @@ func (a *Animego) ParseAnime(anime extractors.Anime) (extractors.Anime, error) {
 		return extractors.Anime{}, err
 	}
 	num, _ := strconv.Atoi(match)
+
+	// get player html from content in json
 	playerContent, err := a.getPlayerContent(fmt.Sprintf("https://animego.me/player/%d", num))
 	if err != nil {
 		log.Printf("error in getting playerContent %v\n", err)
 		return extractors.Anime{}, err
 	}
 
+	// parsing players from html
 	players, err := a.FetchPlayers(playerContent)
 	if err != nil {
 		log.Printf("error in geting players: %v\n", err)
 		return extractors.Anime{}, err
 	}
 	anime.AvailablePlayers = players
+
+	// parsing episodes (name, id)
+	anime.Episodes = a.parseEpisodes(playerContent)
+
 	return anime, nil
+}
+
+func (a *Animego) parseEpisodes(html string) []extractors.Episode {
+	re := regexp.MustCompile(`data-episode-title="([^"]*)"[^>]*data-episode="(\d+)"`)
+	matches := re.FindAllStringSubmatch(html, -1)
+
+	episodes := make([]extractors.Episode, 0, len(matches))
+	for _, m := range matches {
+		id, err := strconv.Atoi(m[2])
+		if err != nil {
+			continue
+		}
+		episodes = append(episodes, extractors.Episode{
+			Title: m[1],
+			ID:    strconv.Itoa(id),
+		})
+	}
+	return episodes
 }
 
 // fetchURL performs an HTTP GET with browser-like headers.
@@ -147,11 +173,11 @@ func StripHTML(s string) string {
 }
 
 // fetching https://animego.me/player/2422 and returning content string
-func (a *Animego) getPlayerContent(url string) (*string, error) {
+func (a *Animego) getPlayerContent(url string) (string, error) {
 	req, err := http.NewRequest("GET", url, nil)
 	log.Printf("url of request: %v\n", url)
 	if err != nil {
-		return nil, fmt.Errorf("create request: %w", err)
+		return "", fmt.Errorf("create request: %w", err)
 	}
 
 	// Указываем заголовки — сервер может возвращать HTML без них
@@ -160,23 +186,23 @@ func (a *Animego) getPlayerContent(url string) (*string, error) {
 
 	resp, err := a.httpClient.Do(req)
 	if err != nil {
-		return nil, fmt.Errorf("http get: %w", err)
+		return "", fmt.Errorf("http get: %w", err)
 	}
 	if resp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("not ok status in fetchinf players: %d\n", resp.StatusCode)
+		return "", fmt.Errorf("not ok status in fetchinf players: %d\n", resp.StatusCode)
 	}
 	defer resp.Body.Close()
 
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return nil, fmt.Errorf("read body: %w", err)
+		return "", fmt.Errorf("read body: %w", err)
 	}
 
 	var result Response
 	if err := json.Unmarshal(body, &result); err != nil {
 		log.Printf("resp: %v\n", string(body))
-		return nil, fmt.Errorf("unmarshal json: %w", err)
+		return "", fmt.Errorf("unmarshal json: %w", err)
 	}
 
-	return &result.Data.Content, nil
+	return result.Data.Content, nil
 }

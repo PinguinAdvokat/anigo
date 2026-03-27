@@ -38,7 +38,16 @@ func filenameFromURL(raw string) (string, error) {
 }
 
 func downloadHTML(urlStr, filename string) error {
-	resp, err := http.Get(urlStr)
+	client := http.Client{}
+	req, err := http.NewRequest(http.MethodGet, urlStr, nil)
+	if err != nil {
+		return fmt.Errorf("error in create request: %w", err)
+	}
+	req.Header.Set("X-Requested-With", "XMLHttpRequest")
+	req.Header.Set("content-encoding", "gzip")
+	req.Header.Set("Referer", "https://animego.me/anime/van-pis-s1-65")
+	req.Header.Set("Accept", "*/*")
+	resp, err := client.Do(req)
 	if err != nil {
 		return fmt.Errorf("request error: %w", err)
 	}

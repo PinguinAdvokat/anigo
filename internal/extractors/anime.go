@@ -11,11 +11,12 @@ type Anime struct {
 	SelectedSource     []string
 	EpisodesCount      int
 	Episodes           []Episode
+	Parsed             bool
 }
 
 type Episode struct {
-	Name      string
-	SourceURL string
+	Title string
+	ID    string
 }
 
 var (

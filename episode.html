@@ -1,0 +1,83 @@
+    <div class="offcanvas-header">
+        <h5 class="offcanvas-title">Выберите озвучку и плеер</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Закрыть" data-bs-target="#playerMenu"></button>
+    </div>
+    <div class="offcanvas-body d-flex flex-column flex-grow-1 px-3">
+        <!-- Nav tabs -->
+        <ul class="nav nav-tabs" id="video-player" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active fs-5" id="translation-tab" data-bs-toggle="tab" data-bs-target="#translation" type="button" role="tab" aria-controls="translation" aria-selected="true">Озвучка</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link fs-5" id="provider-tab" data-bs-toggle="tab" data-bs-target="#provider" type="button" role="tab" aria-controls="provider" aria-selected="false">Плеер</button>
+            </li>
+        </ul>
+
+        <!-- Tab panes -->
+        <div class="tab-content d-flex flex-column flex-grow-1 position-relative overflow-hidden overflow-y-auto">
+            <div class="tab-pane flex-grow-1 active" id="translation" role="tabpanel" aria-labelledby="translation-tab" tabindex="0">
+                <div class="list-group pt-2 position-absolute w-100">
+                                                                                                                
+                                
+                                <button class="align-items-center d-flex gap-2 list-group-item list-group-item-action mb-1" role="button" data-translation="1"><span class="text-truncate">AniDUB</span> <span class="error__player d-none text-danger small text-nowrap">(ошибка)</span></button>
+                                                                                                                            
+                                
+                                <button class="align-items-center d-flex gap-2 list-group-item list-group-item-action mb-1" role="button" data-translation="4"><span class="text-truncate">SHIZA Project</span> <span class="error__player d-none text-danger small text-nowrap">(ошибка)</span></button>
+                                                                                                                            
+                                
+                                <button class="align-items-center d-flex gap-2 list-group-item list-group-item-action mb-1" role="button" data-translation="7"><span class="text-truncate">AniMedia</span> <span class="error__player d-none text-danger small text-nowrap">(ошибка)</span></button>
+                                                                                                                                                                                                                                                                    </div>
+            </div>
+            <div class="tab-pane tab-pane flex-grow-1" id="provider" role="tabpanel" aria-labelledby="provider-tab" tabindex="0">
+                <div class="list-group pt-2 position-absolute w-100">
+                                        
+                            
+                            <button data-player="//kodikplayer.com/seria/207509/dcd898443ffce5ac596eb3e83f339d5a/720p?translations=false" data-provider="19" data-ptranslation="1" data-provider-title="Kodik" data-translation-title="AniDUB" class="align-items-center d-flex gap-2 list-group-item list-group-item-action mb-1" role="button"><span class="text-truncate">Kodik</span> <span class="error__player d-none text-danger small text-nowrap">(ошибка)</span></button>
+
+                    
+                            
+                            <button data-player="//kodikplayer.com/seria/568790/361ae4823d896bb93db891f836067791/720p?translations=false" data-provider="19" data-ptranslation="4" data-provider-title="Kodik" data-translation-title="SHIZA Project" class="align-items-center d-flex gap-2 list-group-item list-group-item-action mb-1" role="button"><span class="text-truncate">Kodik</span> <span class="error__player d-none text-danger small text-nowrap">(ошибка)</span></button>
+
+                    
+                            
+                            <button data-player="//kodikplayer.com/seria/593083/d21053db3f073ee7fee3465ca62ed203/720p?translations=false" data-provider="19" data-ptranslation="7" data-provider-title="Kodik" data-translation-title="AniMedia" class="align-items-center d-flex gap-2 list-group-item list-group-item-action mb-1" role="button"><span class="text-truncate">Kodik</span> <span class="error__player d-none text-danger small text-nowrap">(ошибка)</span></button>
+
+                                    </div>
+            </div>
+        </div>
+                <div class="d-none d-lg-flex">
+            <button class="btn btn-player-watched me-auto watched__bookmarks text-secondary-emphasis icon-link" data-ajax-url="/anime/episode/watched" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" data-tooltip-watch="Отметить эпизод как просмотренный" data-tooltip-unwatch="Добавить в закладки" data-tooltip-bookmarks="Удалить из закладок" data-bs-title="Отметить эпизод как просмотренный">
+                <span class="icon-link watch">
+                    <svg class="bi" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                        <path d="M12.0003 3C17.3924 3 21.8784 6.87976 22.8189 12C21.8784 17.1202 17.3924 21 12.0003 21C6.60812 21 2.12215 17.1202 1.18164 12C2.12215 6.87976 6.60812 3 12.0003 3ZM12.0003 19C16.2359 19 19.8603 16.052 20.7777 12C19.8603 7.94803 16.2359 5 12.0003 5C7.7646 5 4.14022 7.94803 3.22278 12C4.14022 16.052 7.7646 19 12.0003 19ZM12.0003 16.5C9.51498 16.5 7.50026 14.4853 7.50026 12C7.50026 9.51472 9.51498 7.5 12.0003 7.5C14.4855 7.5 16.5003 9.51472 16.5003 12C16.5003 14.4853 14.4855 16.5 12.0003 16.5ZM12.0003 14.5C13.381 14.5 14.5003 13.3807 14.5003 12C14.5003 10.6193 13.381 9.5 12.0003 9.5C10.6196 9.5 9.50026 10.6193 9.50026 12C9.50026 13.3807 10.6196 14.5 12.0003 14.5Z"></path>
+                    </svg>
+                    В просмотренное
+                </span>
+                <span class="icon-link unwatch">
+                    <svg class="bi" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M11.602 13.7599L13.014 15.1719L21.4795 6.7063L22.8938 8.12051L13.014 18.0003L6.65 11.6363L8.06421 10.2221L10.189 12.3469L11.6025 13.7594L11.602 13.7599ZM11.6037 10.9322L16.5563 5.97949L17.9666 7.38977L13.014 12.3424L11.6037 10.9322ZM8.77698 16.5873L7.36396 18.0003L1 11.6363L2.41421 10.2221L3.82723 11.6352L3.82604 11.6363L8.77698 16.5873Z"></path></svg>
+                    Просмотрен
+                </span>
+                <span class="icon-link bookmarks">
+                    <svg class="bi text-danger-emphasis" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                        <path d="M5 2H19C19.5523 2 20 2.44772 20 3V22.1433C20 22.4194 19.7761 22.6434 19.5 22.6434C19.4061 22.6434 19.314 22.6168 19.2344 22.5669L12 18.0313L4.76559 22.5669C4.53163 22.7136 4.22306 22.6429 4.07637 22.4089C4.02647 22.3293 4 22.2373 4 22.1433V3C4 2.44772 4.44772 2 5 2Z"></path>
+                    </svg>
+                    В закладках
+                </span>
+            </button>
+                            <div class="d-flex subscribe-container">
+                    <button class="subscribe__button subscribe-button btn btn-outline-secondary icon-link position-relative fs-5" data-ajax-url="/player/subscribe/3276/show" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" data-bs-title="Уведомления">
+                        <svg class="bi" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                            <path d="M12 2C16.9706 2 21 6.04348 21 11.0314V20H3V11.0314C3 6.04348 7.02944 2 12 2ZM9.5 21H14.5C14.5 22.3807 13.3807 23.5 12 23.5C10.6193 23.5 9.5 22.3807 9.5 21Z"></path>
+                        </svg>
+                    </button>
+                    <button class="subscribe__button unsubscribe-button btn icon-link btn-outline-secondary position-relative fs-5" data-ajax-url="/player/subscribe/3276/show" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" data-bs-title="Уведомления включены">
+                        <svg class="bi text-danger-emphasis" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                            <path d="M12 2C16.9706 2 21 6.04348 21 11.0314V20H3V11.0314C3 6.04348 7.02944 2 12 2ZM9.5 21H14.5C14.5 22.3807 13.3807 23.5 12 23.5C10.6193 23.5 9.5 22.3807 9.5 21Z"></path>
+                        </svg>
+                        <span class="badge icon-link p-0 position-absolute rounded-pill text-success translate-middle">
+                            <svg class="bi" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22ZM17.4571 9.45711L11 15.9142L6.79289 11.7071L8.20711 10.2929L11 13.0858L16.0429 8.04289L17.4571 9.45711Z"></path></svg>
+                        </span>
+                                            </button>
+                </div>
+        </div>
+            </div>

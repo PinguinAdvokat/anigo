@@ -14,10 +14,10 @@ type Response struct {
 
 // FetchPlayers делает GET-запрос по url, парсит JSON-ответ
 // и возвращает список уникальных плееров (например ["AniBoom", "Kodik", "Sibnet"]).
-func (a *Animego) FetchPlayers(content *string) ([]string, error) {
+func (a *Animego) FetchPlayers(content string) ([]string, error) {
 	// Ищем все вхождения data-provider-title="..." в HTML
 	re := regexp.MustCompile(`data-provider-title="([^"]+)"`)
-	matches := re.FindAllStringSubmatch(*content, -1)
+	matches := re.FindAllStringSubmatch(content, -1)
 
 	// Дедуплицируем с сохранением порядка
 	seen := make(map[string]bool)

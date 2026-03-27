@@ -4,7 +4,6 @@ import (
 	"anigo/internal/extractors"
 	"log"
 	"sync"
-	"time"
 )
 
 type Extractor interface {
@@ -41,17 +40,7 @@ func (m *Manager) ParseAnime(animeIndex int) error {
 		log.Printf("manager failed in parsing anime: %v\n", err)
 		return err
 	}
+	parsedAnime.Parsed = true
 	m.FoundAnime[animeIndex] = parsedAnime
-	return nil
-}
-
-func (m *Manager) ParseEpisodes(animeIndex int) error {
-	time.Sleep(3 * time.Second)
-	m.FoundAnime[animeIndex].Episodes = []extractors.Episode{
-		extractors.Episode{Name: "перая серия", SourceURL: "https://example.com"},
-		extractors.Episode{Name: "вторая серия", SourceURL: "https://example.com"},
-		extractors.Episode{Name: "третья серия", SourceURL: "https://example.com"},
-		extractors.Episode{Name: "четвёртая серия", SourceURL: "https://example.com"},
-	}
 	return nil
 }

@@ -2,7 +2,6 @@ package containers
 
 import (
 	"fmt"
-	"log"
 
 	"github.com/rivo/tview"
 )
@@ -25,6 +24,8 @@ func NewEpisodeSelect(app controller) *EpisodeSelector {
 	e.SetTitle("Серия")
 
 	e.EpisodesList.ShowSecondaryText(false)
+
+	e.AddItem(e.EpisodesList, 0, 1, true)
 	return e
 }
 
@@ -33,28 +34,12 @@ func (e *EpisodeSelector) SetEpisodes(animeIndex int) {
 
 	e.SetTitle(manager.FoundAnime[animeIndex].Title)
 
-	go func() {
-		defer e.app.Draw()
+	e.EpisodesList.Clear()
+	for idx, episode := range manager.FoundAnime[animeIndex].Episodes {
+		e.EpisodesList.AddItem(fmt.Sprintf("[%d] %s [id:%s]", idx+1, episode.Title, episode.ID), "", 0, nil)
+	}
+	e.Clear().
+		AddItem(e.EpisodesList, 0, 1, true)
 
-		if len(manager.FoundAnime[animeIndex].Episodes) == 0 {
-			e.Clear().
-				AddItem(e.app.GetSpinner(), 0, 1, false)
-			e.app.Draw()
-
-			err := manager.ParseEpisodes(animeIndex)
-			if err != nil {
-				log.Printf("error in getting episodes: %v", err)
-				e.Clear().
-					AddItem(NewErrorView(fmt.Sprintf("error in getting episodes: %v", err)), 0, 1, false)
-				return
-			}
-		}
-
-		e.EpisodesList.Clear()
-		for idx, episode := range manager.FoundAnime[animeIndex].Episodes {
-			e.EpisodesList.AddItem(fmt.Sprintf("[%d] %s", idx+1, episode.Name), "", 0, nil)
-		}
-		e.Clear().
-			AddItem(e.EpisodesList, 0, 1, true)
-	}()
+	// e.app.Draw()
 }
