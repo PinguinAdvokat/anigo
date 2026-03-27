@@ -24,8 +24,8 @@ func NewEpisodeSelect(app controller) *EpisodeSelector {
 	e.SetTitle("Серия")
 
 	e.EpisodesList.ShowSecondaryText(false)
-
 	e.AddItem(e.EpisodesList, 0, 1, true)
+
 	return e
 }
 
@@ -40,6 +40,4 @@ func (e *EpisodeSelector) SetEpisodes(animeIndex int) {
 	}
 	e.Clear().
 		AddItem(e.EpisodesList, 0, 1, true)
-
-	// e.app.Draw()
 }

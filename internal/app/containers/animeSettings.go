@@ -60,8 +60,8 @@ func (a *AnimeSettings) SetAnimeSettings(index int) {
 				a.setContent([]tview.Primitive{NewErrorView(fmt.Sprintf("Ошибка при поиске: %v", err))})
 				return
 			}
-			a.Voiceover.SetOptions(manager.FoundAnime[index].AvailableVoiceover, nil)
-			a.Player.SetOptions(manager.FoundAnime[index].AvailablePlayers, nil)
+			a.Voiceover.SetOptions(manager.FoundAnime[index].AvailableVoiceover, nil).SetCurrentOption(0)
+			a.Player.SetOptions(manager.FoundAnime[index].AvailablePlayers, nil).SetCurrentOption(0)
 			a.setContent([]tview.Primitive{a.Voiceover, a.Player})
 		}()
 	}

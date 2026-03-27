@@ -65,7 +65,7 @@ func rot18(s string) string {
 func (k *Kodik) getSources(ctx context.Context, payload url.Values) (map[string]string, error) {
 	op := "kodik/getSources"
 
-	req, err := http.NewRequestWithContext(ctx, http.MethodPost, "https://kodik.info/ftor", strings.NewReader(payload.Encode()))
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, "https://kodikplayer.com/ftor", strings.NewReader(payload.Encode()))
 	if err != nil {
 		log.Printf("error creating request in %v: %v\n", op, err)
 		return nil, err

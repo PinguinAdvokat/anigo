@@ -6,6 +6,7 @@ import (
 	"log"
 	"time"
 
+	"github.com/gdamore/tcell/v2"
 	"github.com/rivo/tview"
 )
 
@@ -21,7 +22,7 @@ type App struct {
 	Quality         *tview.DropDown
 	Spinner         *tview.TextView
 
-	Pages *tview.Pages
+	Pages *Pages
 
 	Manager *manager.Manager
 }
@@ -45,35 +46,27 @@ func New(manager *manager.Manager) *App {
 	a.AnimeSettings = containers.NewAnimeSettings(a)
 	a.EpisodeSelect = containers.NewEpisodeSelect(a)
 
-	// pages
-	SearchFlexPage := tview.NewFlex().SetDirection(tview.FlexColumn).
-		AddItem(a.Menu, 14, 1, true).
-		AddItem(a.SearchContainer, 0, 2, true).
-		AddItem(tview.NewFlex().SetDirection(tview.FlexRow).
-			AddItem(a.Preview, 0, 1, true).
-			AddItem(a.AnimeSettings, 5, 1, true), 0, 1, true)
+	// setup functions
+	setAppFunctions(a)
 
-	libraryPage := tview.NewFlex().SetDirection(tview.FlexColumn).
-		AddItem(a.Menu, 14, 1, true).
-		AddItem(a.Library, 0, 2, true).
-		AddItem(tview.NewFlex().SetDirection(tview.FlexRow).
-			AddItem(a.Preview, 0, 1, true).
-			AddItem(a.AnimeSettings, 5, 1, true), 0, 1, true)
+	log.SetOutput(a.Preview.GetItem(0).(*tview.TextView))
+	log.Println("fsdfsd")
 
-	animePage := tview.NewFlex().SetDirection(tview.FlexColumn).
-		AddItem(a.Menu, 14, 1, true).
-		AddItem(a.EpisodeSelect, 0, 2, true).
-		AddItem(tview.NewFlex().SetDirection(tview.FlexRow).
-			AddItem(a.Preview, 0, 1, true).
-			AddItem(a.Quality, 5, 1, true), 0, 1, true)
+	a.Pages = setupPages(a)
+	a.SetRoot(a.Pages, true)
+	a.SetFocus(a.Pages)
+	return a
+}
 
-	pages := tview.NewPages().
-		AddPage("SearchFlex", SearchFlexPage, true, true).
-		AddPage("library", libraryPage, true, true).
-		AddPage("anime", animePage, true, true).
-		SwitchToPage("SearchFlex")
+func (a *App) GetSpinner() *tview.TextView {
+	return a.Spinner
+}
 
-	// functions
+func (a *App) GetManager() *manager.Manager {
+	return a.Manager
+}
+
+func setAppFunctions(a *App) {
 	// menu
 	a.Menu.SetChangedFunc(func(index int, mainText, secondaryText string, shortcut rune) {
 		switch index {
@@ -98,25 +91,18 @@ func New(manager *manager.Manager) *App {
 
 	// EpisodeSelector
 	a.SearchContainer.List.SetSelectedFunc(func(i int, s1, s2 string, r rune) {
-		if a.Manager.FoundAnime[i].Parsed {
+		if a.Manager.FoundAnime[i].Parsed && a.SearchContainer.List.GetCurrentItem() == i {
 			a.EpisodeSelect.SetEpisodes(i)
 			a.Pages.SwitchToPage("anime")
+			a.SetFocus(a.EpisodeSelect)
 		}
 	})
 
-	log.SetOutput(a.Preview.GetItem(0).(*tview.TextView))
-	log.Println("fsdfsd")
-
-	a.Pages = pages
-	a.SetRoot(pages, true)
-	a.SetFocus(pages)
-	return a
-}
-
-func (a *App) GetSpinner() *tview.TextView {
-	return a.Spinner
-}
-
-func (a *App) GetManager() *manager.Manager {
-	return a.Manager
+	// EpisodeSelect
+	a.EpisodeSelect.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
+		if event.Key() == tcell.KeyEscape {
+			a.Pages.SwitchToPreviousPage()
+		}
+		return event
+	})
 }
