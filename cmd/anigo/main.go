@@ -26,8 +26,8 @@ func main() {
 	cache := cache.New(appDir)
 	httpClient := &http.Client{Timeout: 5 * time.Second}
 	kodikParser := kodik.New(httpClient, cache)
-	animego := animego.New(kodikParser, httpClient)
-	manager := manager.New(animego)
+	animego := animego.New(httpClient)
+	manager := manager.New(animego, kodikParser)
 
 	app := app.New(manager)
 	if err := app.EnableMouse(true).EnablePaste(true).Run(); err != nil {

@@ -1,32 +1,19 @@
 package kodik
 
 import (
-	"context"
 	"fmt"
-	"log"
-	"net/url"
 )
 
-func (k *Kodik) Parse(ctx context.Context, kodikURL string) (map[string]string, error) {
-	var payload url.Values
-	v, ok := k.cache.Load(kodikURL)
-	if !ok {
-		log.Printf("value not cached\n")
-		var err error
-		payload, err = k.getPayload(ctx, kodikURL)
-		if err != nil {
-			return nil, err
-		}
-		log.Printf("caching value: %v\n", payload)
-		k.cache.Store(kodikURL, payload)
-	} else {
-		payload = v.(url.Values)
+func (k *Kodik) Parse(kodikURL string) (map[string]string, error) {
+	payload, err := k.getPayload(kodikURL)
+	if err != nil {
+		return nil, err
 	}
 
 	fmt.Println("fetched payload:")
 	fmt.Println(payload)
 
-	sources, err := k.getSources(ctx, payload)
+	sources, err := k.getSources(payload)
 	if err != nil {
 		return nil, err
 	}

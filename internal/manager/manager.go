@@ -2,6 +2,7 @@ package manager
 
 import (
 	"anigo/internal/extractors"
+	"anigo/internal/parsers/kodik"
 	"log"
 	"sync"
 )
@@ -13,13 +14,14 @@ type Extractor interface {
 }
 
 type Manager struct {
-	mu         sync.RWMutex
-	Extractor  Extractor
-	FoundAnime []extractors.Anime
+	mu          sync.RWMutex
+	Extractor   Extractor
+	KodikParser *kodik.Kodik
+	FoundAnime  []extractors.Anime
 }
 
-func New(extractor Extractor) *Manager {
-	return &Manager{Extractor: extractor}
+func New(extractor Extractor, kodikParser *kodik.Kodik) *Manager {
+	return &Manager{Extractor: extractor, KodikParser: kodikParser}
 }
 
 func (m *Manager) Search(name string) error {
@@ -48,4 +50,13 @@ func (m *Manager) ParseAnime(animeIndex int) error {
 
 func (m *Manager) ParseEpisode(animeIndex, episodeIndex int, player, voicecover string) error {
 	return m.Extractor.ParseEpisode(&m.FoundAnime[animeIndex].Episodes[episodeIndex], player, voicecover)
+}
+
+func (m *Manager) GetVideoURL(animeIndex, episodeIndex int) {
+	url, err := m.KodikParser.Parse(m.FoundAnime[animeIndex].Episodes[episodeIndex].PlayerURL)
+	if err != nil {
+		log.Printf("error get Videourl: %v", err)
+		return
+	}
+	log.Printf("urls: %v", url)
 }

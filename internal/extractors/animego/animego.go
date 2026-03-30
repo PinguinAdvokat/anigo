@@ -11,10 +11,9 @@ type Animego struct {
 	kodikParser *kodik.Kodik
 }
 
-func New(kodikParser *kodik.Kodik, httpClient *http.Client) *Animego {
+func New(httpClient *http.Client) *Animego {
 	return &Animego{
-		BaseURL:     "https://animego.me",
-		httpClient:  httpClient,
-		kodikParser: kodikParser,
+		BaseURL:    "https://animego.me",
+		httpClient: httpClient,
 	}
 }

@@ -1,7 +1,6 @@
 package kodik
 
 import (
-	"context"
 	"encoding/base64"
 	"encoding/json"
 	"log"
@@ -32,9 +31,10 @@ type response struct {
 func decodeURL(s string) (string, error) {
 	// Сначала применяем ROT18
 	decoded := rot18(s)
+	log.Printf("raw: %s\ndecoded: %s", s, decoded)
 
 	// Затем декодируем из base64
-	result, err := base64.StdEncoding.DecodeString(decoded)
+	result, err := base64.RawURLEncoding.DecodeString(decoded)
 	if err != nil {
 		return "", err
 	}
@@ -42,30 +42,26 @@ func decodeURL(s string) (string, error) {
 	return string(result), nil
 }
 
-// rot18 применяет ROT18 к строке (только буквы, числа не меняются)
+// DecodeRot18 применяет к строке сдвиг ROT18 (каждый символ a-z/A-Z сдвигается на 18 позиций)
+// Результат можно использовать как для кодирования, так и для декодирования (в отличие от ROT13,
+// для восстановления исходной строки потребуется сдвиг на 8, но по условию требуется именно ROT18).
 func rot18(s string) string {
-	result := make([]rune, 0, len(s))
-
-	for _, r := range s {
-		if r >= 'a' && r <= 'z' {
-			// Поворот на 18 позиций в нижнем регистре
-			result = append(result, ((r-'a'+18)%26)+'a')
-		} else if r >= 'A' && r <= 'Z' {
-			// Поворот на 18 позиций в верхнем регистре
-			result = append(result, ((r-'A'+18)%26)+'A')
-		} else {
-			// Числа и прочие символы не меняются
-			result = append(result, r)
+	runes := []rune(s)
+	for i, r := range runes {
+		switch {
+		case r >= 'a' && r <= 'z':
+			runes[i] = 'a' + (r-'a'+18)%26
+		case r >= 'A' && r <= 'Z':
+			runes[i] = 'A' + (r-'A'+18)%26
 		}
 	}
-
-	return string(result)
+	return string(runes)
 }
 
-func (k *Kodik) getSources(ctx context.Context, payload url.Values) (map[string]string, error) {
+func (k *Kodik) getSources(payload url.Values) (map[string]string, error) {
 	op := "kodik/getSources"
 
-	req, err := http.NewRequestWithContext(ctx, http.MethodPost, "https://kodikplayer.com/ftor", strings.NewReader(payload.Encode()))
+	req, err := http.NewRequest(http.MethodPost, "https://kodikplayer.com/ftor", strings.NewReader(payload.Encode()))
 	if err != nil {
 		log.Printf("error creating request in %v: %v\n", op, err)
 		return nil, err

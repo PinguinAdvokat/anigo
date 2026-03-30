@@ -132,4 +132,11 @@ func setAppFunctions(a *App) {
 			}
 		}()
 	})
+
+	// enter
+	a.EpisodeSelect.EpisodesList.SetSelectedFunc(func(i int, s1, s2 string, r rune) {
+		if a.Manager.FoundAnime[a.GetSelectedAnime()].Episodes[i].PlayerURL != "" {
+			a.Manager.GetVideoURL(a.GetSelectedAnime(), i)
+		}
+	})
 }

@@ -1,7 +1,6 @@
 package kodik
 
 import (
-	"context"
 	"io"
 	"log"
 	"net/http"
@@ -9,9 +8,10 @@ import (
 	"regexp"
 )
 
-func (k *Kodik) getHTML(ctx context.Context, kodikURL string) (string, error) {
+func (k *Kodik) getHTML(kodikURL string) (string, error) {
 	op := "getPayload/getHTML"
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, kodikURL, nil)
+	log.Printf("KodikUrl: %s", kodikURL)
+	req, err := http.NewRequest(http.MethodGet, kodikURL, nil)
 	if err != nil {
 		log.Printf("error creating request in %v: %v\n", op, err)
 		return "", err
@@ -39,8 +39,8 @@ func (k *Kodik) getHTML(ctx context.Context, kodikURL string) (string, error) {
 	return string(html), nil
 }
 
-func (k *Kodik) getPayload(ctx context.Context, kodikURL string) (url.Values, error) {
-	html, err := k.getHTML(ctx, kodikURL)
+func (k *Kodik) getPayload(kodikURL string) (url.Values, error) {
+	html, err := k.getHTML(kodikURL)
 	if err != nil {
 		return nil, err
 	}

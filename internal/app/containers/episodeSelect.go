@@ -56,11 +56,11 @@ func (e *EpisodeSelector) ParseEpisode(animeIndex, episodeIndex int) {
 				quality.SetItem(NewErrorView(fmt.Sprintf("error in parsing episode: %s\n", err)))
 				return
 			}
-			quality.Selector.SetOptions([]string{"test1", "test2"}, nil)
+			quality.Selector.SetOptions([]string{"480"}, nil)
 			quality.SetItem(quality.Selector)
 		}()
 	} else {
-		quality.Selector.SetOptions([]string{"test1", "test2"}, nil)
+		quality.Selector.SetOptions([]string{"480"}, nil)
 		quality.SetItem(quality.Selector)
 	}
 }
