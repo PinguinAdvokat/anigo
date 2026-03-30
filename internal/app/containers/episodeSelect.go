@@ -41,3 +41,26 @@ func (e *EpisodeSelector) SetEpisodes(animeIndex int) {
 	e.Clear().
 		AddItem(e.EpisodesList, 0, 1, true)
 }
+
+func (e *EpisodeSelector) ParseEpisode(animeIndex, episodeIndex int) {
+	manager := e.app.GetManager()
+	quality := e.app.GetQualityPrim()
+
+	player, voicecover := e.app.GetAnimeSettings(animeIndex)
+
+	if manager.FoundAnime[animeIndex].Episodes[episodeIndex].PlayerURL == "" {
+		quality.SetItem(e.app.GetSpinner())
+		go func() {
+			err := manager.ParseEpisode(animeIndex, episodeIndex, player, voicecover)
+			if err != nil {
+				quality.SetItem(NewErrorView(fmt.Sprintf("error in parsing episode: %s\n", err)))
+				return
+			}
+			quality.Selector.SetOptions([]string{"test1", "test2"}, nil)
+			quality.SetItem(quality.Selector)
+		}()
+	} else {
+		quality.Selector.SetOptions([]string{"test1", "test2"}, nil)
+		quality.SetItem(quality.Selector)
+	}
+}

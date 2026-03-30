@@ -11,4 +11,6 @@ type controller interface {
 
 	GetSpinner() *tview.TextView
 	GetManager() *manager.Manager
+	GetQualityPrim() *Quality
+	GetAnimeSettings(int) (string, string)
 }

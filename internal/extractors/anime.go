@@ -15,8 +15,10 @@ type Anime struct {
 }
 
 type Episode struct {
-	Title string
-	ID    string
+	Title            string
+	ID               string
+	PlayerURL        string
+	AvailableQuality []string
 }
 
 var (

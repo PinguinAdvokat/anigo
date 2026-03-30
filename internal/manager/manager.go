@@ -9,6 +9,7 @@ import (
 type Extractor interface {
 	Search(string) ([]extractors.Anime, error)
 	ParseAnime(extractors.Anime) (extractors.Anime, error)
+	ParseEpisode(*extractors.Episode, string, string) error
 }
 
 type Manager struct {
@@ -43,4 +44,8 @@ func (m *Manager) ParseAnime(animeIndex int) error {
 	parsedAnime.Parsed = true
 	m.FoundAnime[animeIndex] = parsedAnime
 	return nil
+}
+
+func (m *Manager) ParseEpisode(animeIndex, episodeIndex int, player, voicecover string) error {
+	return m.Extractor.ParseEpisode(&m.FoundAnime[animeIndex].Episodes[episodeIndex], player, voicecover)
 }

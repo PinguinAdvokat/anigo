@@ -2,13 +2,25 @@ package containers
 
 import "github.com/rivo/tview"
 
-func NewQuality() *tview.DropDown {
-	dropDown := tview.NewDropDown()
-	dropDown.SetBorder(true)
-	dropDown.SetTitle("Качество")
-	dropDown.SetLabel("Качество")
-	dropDown.SetTitleAlign(tview.AlignCenter)
-	dropDown.AddOption("720p", nil)
-	dropDown.AddOption("480p", nil)
-	return dropDown
+type Quality struct {
+	*tview.Flex
+
+	Selector *tview.DropDown
+}
+
+func NewQuality() *Quality {
+	q := &Quality{
+		Flex: tview.NewFlex(),
+	}
+	q.SetBorder(true)
+	q.Selector = tview.NewDropDown()
+	q.Selector.SetLabel("Качество")
+	q.Selector.SetTitleAlign(tview.AlignCenter)
+	q.SetItem(q.Selector)
+	return q
+}
+
+func (q *Quality) SetItem(prim tview.Primitive) {
+	q.Flex.Clear()
+	q.Flex.AddItem(prim, 0, 1, true)
 }

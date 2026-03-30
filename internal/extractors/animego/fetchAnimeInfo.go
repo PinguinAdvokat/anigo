@@ -189,7 +189,7 @@ func (a *Animego) getPlayerContent(url string) (string, error) {
 		return "", fmt.Errorf("http get: %w", err)
 	}
 	if resp.StatusCode != http.StatusOK {
-		return "", fmt.Errorf("not ok status in fetchinf players: %d\n", resp.StatusCode)
+		return "", fmt.Errorf("not ok status in fetchinfo players: %d\n", resp.StatusCode)
 	}
 	defer resp.Body.Close()
 

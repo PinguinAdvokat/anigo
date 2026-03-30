@@ -19,7 +19,7 @@ type App struct {
 	EpisodeSelect   *containers.EpisodeSelector
 	Preview         *tview.Flex
 	AnimeSettings   *containers.AnimeSettings
-	Quality         *tview.DropDown
+	Quality         *containers.Quality
 	Spinner         *tview.TextView
 
 	Pages *Pages
@@ -66,6 +66,21 @@ func (a *App) GetManager() *manager.Manager {
 	return a.Manager
 }
 
+func (a *App) GetQualityPrim() *containers.Quality {
+	return a.Quality
+}
+
+// player, voicecover
+func (a *App) GetAnimeSettings(animeIndex int) (string, string) {
+	_, player := a.AnimeSettings.Player.GetCurrentOption()
+	_, voicecover := a.AnimeSettings.Voiceover.GetCurrentOption()
+	return player, voicecover
+}
+
+func (a *App) GetSelectedAnime() int {
+	return a.SearchContainer.List.GetCurrentItem()
+}
+
 func setAppFunctions(a *App) {
 	// menu
 	a.Menu.SetChangedFunc(func(index int, mainText, secondaryText string, shortcut rune) {
@@ -80,16 +95,15 @@ func setAppFunctions(a *App) {
 	// Getting anime info on selected
 	a.SearchContainer.List.SetChangedFunc(func(index int, mainText, secondaryText string, shortcut rune) {
 		go func() {
-			time.Sleep(time.Millisecond * 300)
+			time.Sleep(time.Millisecond * 500)
 			if a.SearchContainer.List.GetCurrentItem() == index {
-				log.Print("setanimesettings")
 				a.Draw()
 				a.AnimeSettings.SetAnimeSettings(index)
 			}
 		}()
 	})
 
-	// EpisodeSelector
+	// Switch from search to anime
 	a.SearchContainer.List.SetSelectedFunc(func(i int, s1, s2 string, r rune) {
 		if a.Manager.FoundAnime[i].Parsed && a.SearchContainer.List.GetCurrentItem() == i {
 			a.EpisodeSelect.SetEpisodes(i)
@@ -98,11 +112,24 @@ func setAppFunctions(a *App) {
 		}
 	})
 
-	// EpisodeSelect
+	// EpisodeSelector
+	// escape
 	a.EpisodeSelect.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
 		if event.Key() == tcell.KeyEscape {
 			a.Pages.SwitchToPreviousPage()
+			a.SetFocus(a.SearchContainer.List)
 		}
 		return event
+	})
+
+	// selected
+	a.EpisodeSelect.EpisodesList.SetChangedFunc(func(index int, mainText, secondaryText string, shortcut rune) {
+		go func() {
+			time.Sleep(time.Millisecond * 500)
+			if a.EpisodeSelect.EpisodesList.GetCurrentItem() == index {
+				a.Draw()
+				a.EpisodeSelect.ParseEpisode(a.GetSelectedAnime(), index)
+			}
+		}()
 	})
 }
