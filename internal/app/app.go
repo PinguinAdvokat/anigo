@@ -5,6 +5,7 @@ import (
 	"anigo/internal/manager"
 	"anigo/internal/mpv"
 	"log"
+	"net/http"
 	"time"
 
 	"github.com/gdamore/tcell/v2"
@@ -18,7 +19,7 @@ type App struct {
 	Library         *tview.List
 	SearchContainer *containers.Search
 	EpisodeSelect   *containers.EpisodeSelector
-	Preview         *tview.Flex
+	Preview         *containers.Preview
 	AnimeSettings   *containers.AnimeSettings
 	Quality         *containers.Quality
 	Spinner         *tview.TextView
@@ -29,7 +30,7 @@ type App struct {
 	Mpv     *mpv.Mpv
 }
 
-func New(manager *manager.Manager, mpv *mpv.Mpv) *App {
+func New(manager *manager.Manager, mpv *mpv.Mpv, client *http.Client) *App {
 	a := &App{
 		Application: tview.NewApplication(),
 
@@ -37,9 +38,9 @@ func New(manager *manager.Manager, mpv *mpv.Mpv) *App {
 		AnimeSettings:   nil,
 		EpisodeSelect:   nil,
 		Quality:         nil,
+		Preview:         nil,
 		Menu:            containers.NewMenu(),
 		Library:         containers.NewLibrary(),
-		Preview:         containers.NewPreview(),
 
 		Manager: manager,
 		Mpv:     mpv,
@@ -49,6 +50,7 @@ func New(manager *manager.Manager, mpv *mpv.Mpv) *App {
 	a.AnimeSettings = containers.NewAnimeSettings(a)
 	a.EpisodeSelect = containers.NewEpisodeSelect(a)
 	a.Quality = containers.NewQuality(a)
+	a.Preview = containers.NewPreview(a, client)
 
 	// setup functions
 	setAppFunctions(a)
@@ -100,6 +102,7 @@ func setAppFunctions(a *App) {
 			if a.SearchContainer.List.GetCurrentItem() == index {
 				a.Draw()
 				a.AnimeSettings.SetAnimeSettings(index)
+				a.Preview.SetImageURL("https://img.cdngos.com/anime/5e/5e146c0e398d3512268183")
 			}
 		}()
 	})

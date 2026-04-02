@@ -30,13 +30,13 @@ func main() {
 	log.SetOutput(logFile)
 
 	cache := cache.New(appDir)
-	httpClient := &http.Client{Timeout: 5 * time.Second}
+	httpClient := &http.Client{Timeout: 3 * time.Second}
 	kodikParser := kodik.New(httpClient, cache)
 	animego := animego.New(httpClient)
 	mpv := mpv.New()
 	manager := manager.New(animego, kodikParser)
 
-	app := app.New(manager, mpv)
+	app := app.New(manager, mpv, httpClient)
 	if err := app.EnableMouse(true).EnablePaste(true).Run(); err != nil {
 		panic(err)
 	}
