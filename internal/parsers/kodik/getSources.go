@@ -10,28 +10,20 @@ import (
 	"strings"
 )
 
-type response struct {
-	Links struct {
-		R360 []struct {
-			Src string `json:"Src"`
-		} `json:"360"`
-		R480 []struct {
-			Src string `json:"Src"`
-		} `json:"480"`
-		R720 []struct {
-			Src string `json:"Src"`
-		} `json:"720"`
-		R1080 []struct {
-			Src string `json:"Src"`
-		} `json:"1080"`
-	} `json:"Links"`
+type Response struct {
+	Links LinkMap `json:"links"`
+}
+
+type LinkMap map[string][]LinkItem
+
+type LinkItem struct {
+	Src string `json:"src"`
 }
 
 // DecodeROT18AndBase64 декодирует строку применяя ROT18 (без поворота чисел), затем base64
 func decodeURL(s string) (string, error) {
 	// Сначала применяем ROT18
 	decoded := rot18(s)
-	log.Printf("raw: %s\ndecoded: %s", s, decoded)
 
 	// Затем декодируем из base64
 	result, err := base64.RawURLEncoding.DecodeString(decoded)
@@ -81,44 +73,25 @@ func (k *Kodik) getSources(payload url.Values) (map[string]string, error) {
 		return nil, err
 	}
 
-	var parsed response
+	var parsed Response
 	if err := json.NewDecoder(resp.Body).Decode(&parsed); err != nil {
 		log.Printf("error reading json response in %v: %v\n", op, err)
 		return nil, err
 	}
 
 	sources := make(map[string]string)
-	if parsed.Links.R360 != nil {
-		url, err := decodeURL(parsed.Links.R360[0].Src)
+	for qual, linkItem := range parsed.Links {
+		url, err := decodeURL(linkItem[0].Src)
 		if err != nil {
-			log.Printf("error decoding url in %v: %v\n", op, err)
-			return nil, err
+			log.Printf("error decodeUrl in %s: %v", op, err)
+		} else {
+			if strings.HasPrefix(url, "https:") {
+				sources[qual] = url
+			} else {
+				sources[qual] = "https:" + url
+			}
 		}
-		sources["360"] = "https:" + url
 	}
-	if parsed.Links.R480 != nil {
-		url, err := decodeURL(parsed.Links.R480[0].Src)
-		if err != nil {
-			log.Printf("error decoding url in %v: %v\n", op, err)
-			return nil, err
-		}
-		sources["480"] = "https:" + url
-	}
-	if parsed.Links.R720 != nil {
-		url, err := decodeURL(parsed.Links.R720[0].Src)
-		if err != nil {
-			log.Printf("error decoding url in %v: %v\n", op, err)
-			return nil, err
-		}
-		sources["720"] = "https:" + url
-	}
-	if parsed.Links.R1080 != nil {
-		url, err := decodeURL(parsed.Links.R1080[0].Src)
-		if err != nil {
-			log.Printf("error decoding url in %v: %v\n", op, err)
-			return nil, err
-		}
-		sources["1080"] = "https:" + url
-	}
+	log.Printf("sources: %v", sources)
 	return sources, nil
 }

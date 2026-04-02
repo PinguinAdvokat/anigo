@@ -6,30 +6,37 @@ import (
 	"anigo/internal/extractors/animego"
 	"anigo/internal/initApp"
 	"anigo/internal/manager"
+	"anigo/internal/mpv"
 	"anigo/internal/parsers/kodik"
 	"flag"
-	"io"
 	"log"
 	"net/http"
+	"path/filepath"
 	"time"
 )
 
 func main() {
-	verbose := flag.Bool("v", false, "включить отладочные логи")
+	logFileFlag := flag.String("logfile", "", "path to file for log writing (creating if not exist)")
 	flag.Parse()
 
-	if !*verbose {
-		log.SetOutput(io.Discard)
-	}
-
 	appDir := initApp.Init()
+
+	logFilePath := *logFileFlag
+	if logFilePath == "" {
+		logFilePath = filepath.Join(appDir, "anigo.log")
+	}
+	logFile := initApp.CreateLogFile(logFilePath)
+	defer logFile.Close()
+	log.SetOutput(logFile)
+
 	cache := cache.New(appDir)
 	httpClient := &http.Client{Timeout: 5 * time.Second}
 	kodikParser := kodik.New(httpClient, cache)
 	animego := animego.New(httpClient)
+	mpv := mpv.New()
 	manager := manager.New(animego, kodikParser)
 
-	app := app.New(manager)
+	app := app.New(manager, mpv)
 	if err := app.EnableMouse(true).EnablePaste(true).Run(); err != nil {
 		panic(err)
 	}

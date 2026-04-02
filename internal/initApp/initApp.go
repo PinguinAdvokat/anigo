@@ -2,8 +2,8 @@ package initApp
 
 import (
 	"fmt"
+	"log"
 	"os"
-	"os/exec"
 	"path/filepath"
 )
 
@@ -20,17 +20,18 @@ func dataDir(appName string) string {
 }
 
 func Init() string {
-	_, err := exec.LookPath("mpv")
-	if err != nil {
-		fmt.Print("Cant find mpv player\n")
-		//os.Exit(0)
-	}
 	appDir := dataDir("anigo")
-	err = os.MkdirAll(appDir, 0755)
+	err := os.MkdirAll(appDir, 0755)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Failed create directory: %v\n", err)
-		os.Exit(1)
+		log.Fatalf("Failed create directory: %v\n", err)
 	}
-
 	return appDir
+}
+
+func CreateLogFile(path string) *os.File {
+	file, err := os.OpenFile(path, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
+	if err != nil {
+		log.Fatal("cant open log file", err)
+	}
+	return file
 }

@@ -49,14 +49,16 @@ func (m *Manager) ParseAnime(animeIndex int) error {
 }
 
 func (m *Manager) ParseEpisode(animeIndex, episodeIndex int, player, voicecover string) error {
-	return m.Extractor.ParseEpisode(&m.FoundAnime[animeIndex].Episodes[episodeIndex], player, voicecover)
-}
-
-func (m *Manager) GetVideoURL(animeIndex, episodeIndex int) {
-	url, err := m.KodikParser.Parse(m.FoundAnime[animeIndex].Episodes[episodeIndex].PlayerURL)
+	episode := &m.FoundAnime[animeIndex].Episodes[episodeIndex]
+	err := m.Extractor.ParseEpisode(episode, player, voicecover)
 	if err != nil {
-		log.Printf("error get Videourl: %v", err)
-		return
+		return err
 	}
-	log.Printf("urls: %v", url)
+
+	links, err := m.KodikParser.Parse(episode.PlayerURL)
+	if err != nil {
+		return err
+	}
+	episode.Links = links
+	return nil
 }

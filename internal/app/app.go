@@ -3,6 +3,7 @@ package app
 import (
 	"anigo/internal/app/containers"
 	"anigo/internal/manager"
+	"anigo/internal/mpv"
 	"log"
 	"time"
 
@@ -25,32 +26,32 @@ type App struct {
 	Pages *Pages
 
 	Manager *manager.Manager
+	Mpv     *mpv.Mpv
 }
 
-func New(manager *manager.Manager) *App {
+func New(manager *manager.Manager, mpv *mpv.Mpv) *App {
 	a := &App{
 		Application: tview.NewApplication(),
 
 		SearchContainer: nil,
 		AnimeSettings:   nil,
 		EpisodeSelect:   nil,
+		Quality:         nil,
 		Menu:            containers.NewMenu(),
 		Library:         containers.NewLibrary(),
 		Preview:         containers.NewPreview(),
-		Quality:         containers.NewQuality(),
 
 		Manager: manager,
+		Mpv:     mpv,
 	}
 	a.Spinner = containers.NewSpinner(a)
 	a.SearchContainer = containers.NewSearch(a)
 	a.AnimeSettings = containers.NewAnimeSettings(a)
 	a.EpisodeSelect = containers.NewEpisodeSelect(a)
+	a.Quality = containers.NewQuality(a)
 
 	// setup functions
 	setAppFunctions(a)
-
-	log.SetOutput(a.Preview.GetItem(0).(*tview.TextView))
-	log.Println("fsdfsd")
 
 	a.Pages = setupPages(a)
 	a.SetRoot(a.Pages, true)
@@ -127,7 +128,6 @@ func setAppFunctions(a *App) {
 		go func() {
 			time.Sleep(time.Millisecond * 500)
 			if a.EpisodeSelect.EpisodesList.GetCurrentItem() == index {
-				a.Draw()
 				a.EpisodeSelect.ParseEpisode(a.GetSelectedAnime(), index)
 			}
 		}()
@@ -135,8 +135,11 @@ func setAppFunctions(a *App) {
 
 	// enter
 	a.EpisodeSelect.EpisodesList.SetSelectedFunc(func(i int, s1, s2 string, r rune) {
-		if a.Manager.FoundAnime[a.GetSelectedAnime()].Episodes[i].PlayerURL != "" {
-			a.Manager.GetVideoURL(a.GetSelectedAnime(), i)
+		if len(a.Manager.FoundAnime[a.GetSelectedAnime()].Episodes[i].Links) != 0 && a.EpisodeSelect.EpisodesList.GetCurrentItem() == i {
+			err := a.Mpv.Play(a.Manager.FoundAnime[a.GetSelectedAnime()].Episodes[i].Links[a.Quality.GetCurrentOption()])
+			if err != nil {
+				log.Printf("error in start mpv: %v", err)
+			}
 		}
 	})
 }

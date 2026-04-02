@@ -6,6 +6,6 @@ type Mpv struct {
 	watchLaterDir        string
 }
 
-func New(watchLaterDir string) *Mpv {
-	return &Mpv{false, []string{}, watchLaterDir}
+func New() *Mpv {
+	return &Mpv{}
 }

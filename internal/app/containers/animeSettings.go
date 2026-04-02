@@ -64,9 +64,7 @@ func (a *AnimeSettings) SetAnimeSettings(index int) {
 			a.Player.SetOptions(manager.FoundAnime[index].AvailablePlayers, nil).SetCurrentOption(0)
 			a.setContent([]tview.Primitive{a.Voiceover, a.Player})
 		}()
-	}
-
-	if len(manager.FoundAnime[index].AvailableVoiceover) > 0 {
+	} else {
 		a.Voiceover.SetOptions(manager.FoundAnime[index].AvailableVoiceover, nil)
 		a.Player.SetOptions(manager.FoundAnime[index].AvailablePlayers, nil)
 		a.setContent([]tview.Primitive{a.Voiceover, a.Player})

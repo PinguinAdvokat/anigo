@@ -1,24 +1,36 @@
 package mpv
 
 import (
-	"os"
+	"fmt"
+	"io"
+	"log"
 	"os/exec"
 )
 
-func (m *Mpv) Play(watchLaterDir string, url string) error {
-	// RAFACTOR THIS BEFORE USE!!!!!!!!!
+func (m *Mpv) Play(url string) error {
+	if m.isPlaying {
+		return fmt.Errorf("mpv player already playing video")
+	}
 	cmd := exec.Command(
 		"mpv",
 		"--save-position-on-quit",
-		"--watch-later-directory="+watchLaterDir,
 		url,
 	)
 
-	cmd.Stdout = os.Stdout
-	cmd.Stderr = os.Stderr
+	cmd.Stdout = io.Discard
+	cmd.Stderr = io.Discard
 
 	if err := cmd.Start(); err != nil {
 		return err
 	}
+	m.isPlaying = true
+	go func() {
+		err := cmd.Wait()
+		m.isPlaying = false
+		if err != nil {
+			log.Printf("error in mpv: %v", err)
+			return
+		}
+	}()
 	return nil
 }

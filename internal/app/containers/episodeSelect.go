@@ -2,6 +2,7 @@ package containers
 
 import (
 	"fmt"
+	"sort"
 
 	"github.com/rivo/tview"
 )
@@ -36,7 +37,7 @@ func (e *EpisodeSelector) SetEpisodes(animeIndex int) {
 
 	e.EpisodesList.Clear()
 	for idx, episode := range manager.FoundAnime[animeIndex].Episodes {
-		e.EpisodesList.AddItem(fmt.Sprintf("[%d] %s [id:%s]", idx+1, episode.Title, episode.ID), "", 0, nil)
+		e.EpisodesList.AddItem(fmt.Sprintf("[%d] %s", idx+1, episode.Title), "", 0, nil)
 	}
 	e.Clear().
 		AddItem(e.EpisodesList, 0, 1, true)
@@ -50,17 +51,28 @@ func (e *EpisodeSelector) ParseEpisode(animeIndex, episodeIndex int) {
 
 	if manager.FoundAnime[animeIndex].Episodes[episodeIndex].PlayerURL == "" {
 		quality.SetItem(e.app.GetSpinner())
-		go func() {
-			err := manager.ParseEpisode(animeIndex, episodeIndex, player, voicecover)
-			if err != nil {
-				quality.SetItem(NewErrorView(fmt.Sprintf("error in parsing episode: %s\n", err)))
-				return
-			}
-			quality.Selector.SetOptions([]string{"480"}, nil)
-			quality.SetItem(quality.Selector)
-		}()
-	} else {
-		quality.Selector.SetOptions([]string{"480"}, nil)
-		quality.SetItem(quality.Selector)
 	}
+	go func() {
+		err := manager.ParseEpisode(animeIndex, episodeIndex, player, voicecover)
+		if err != nil {
+			quality.SetItem(NewErrorView(fmt.Sprintf("error in parsing episode: %s\n", err)))
+			return
+		}
+
+		displayQuality(manager.FoundAnime[animeIndex].Episodes[episodeIndex].Links, quality)
+	}()
+
+	displayQuality(manager.FoundAnime[animeIndex].Episodes[episodeIndex].Links, quality)
+}
+
+func displayQuality(links map[string]string, quality *Quality) {
+	availableQuality := make([]string, 0)
+	for k := range links {
+		availableQuality = append(availableQuality, k)
+	}
+	sort.Strings(availableQuality)
+
+	quality.Selector.SetOptions(availableQuality, nil)
+	quality.Selector.SetCurrentOption(len(links) - 1)
+	quality.SetItem(quality.Selector)
 }
