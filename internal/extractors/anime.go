@@ -3,6 +3,7 @@ package extractors
 type Anime struct {
 	Title              string
 	Description        string
+	CoverURL           string
 	Rating             string
 	URL                string
 	AvailableVoiceover []string

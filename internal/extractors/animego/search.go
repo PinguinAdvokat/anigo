@@ -2,6 +2,7 @@ package animego
 
 import (
 	"anigo/internal/extractors"
+	"fmt"
 	"io"
 	"log"
 	"net/http"
@@ -28,6 +29,7 @@ func (a *Animego) Search(query string) ([]extractors.Anime, error) {
 		log.Printf("not ok status in search (%v)", resp.StatusCode)
 		body, _ := io.ReadAll(resp.Body)
 		log.Printf("body:\n%v", string(body))
+		return nil, fmt.Errorf("%s returned status code: %d", url, resp.StatusCode)
 	}
 	defer resp.Body.Close()
 

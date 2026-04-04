@@ -36,7 +36,7 @@ func (a *Animego) ParseEpisode(episode *extractors.Episode, player string, voice
 	link := links[voicecover][player]
 	if link == "" {
 		log.Printf("cant find selected url for %s+%s\n", player, voicecover)
-		return fmt.Errorf("cant find selected url for %s+%s", player, voicecover)
+		return fmt.Errorf("cant find url for %s+%s", player, voicecover)
 	}
 
 	episode.PlayerURL = "https:" + link

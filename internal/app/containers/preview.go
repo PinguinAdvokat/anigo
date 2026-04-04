@@ -35,18 +35,24 @@ func NewPreview(app controller, client *http.Client) *Preview {
 	}
 	p.Flex.SetBorder(true)
 	p.Flex.SetTitle("Описание")
+	p.Flex.SetBorderPadding(1, 0, 0, 0)
 	p.Flex.Clear()
 	p.Flex.SetDirection(tview.FlexColumn).
 		AddItem(p.Cover, 0, 2, false).
 		AddItem(p.Description, 0, 1, false)
 
-	p.SetBoxResizeFunc(func() {
-		log.Print(p.Cover.GetFieldHeight())
-	})
+	p.SetBoxResizeFunc(p.resize)
+	p.SetImageURL("https://img.cdngos.com/anime/69/69b1b245f1e79123493273")
 
 	p.Description.SetText("example text example text example text example text example text example text example text")
 
 	return p
+}
+
+func (p *Preview) resize() {
+	_, _, _, height := p.Cover.GetRect()
+	height = max(int(float32(height)*1.5), 4)
+	p.Flex.ResizeItem(p.Cover, height, 1)
 }
 
 func (p *Preview) SetImageURL(url string) {
@@ -56,6 +62,7 @@ func (p *Preview) SetImageURL(url string) {
 		return
 	}
 	p.Cover.SetImage(img).SetColors(tview.TrueColor)
+	p.resize()
 }
 
 func (p *Preview) loadFromURL(url string) (image.Image, error) {

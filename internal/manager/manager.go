@@ -9,7 +9,7 @@ import (
 
 type Extractor interface {
 	Search(string) ([]extractors.Anime, error)
-	ParseAnime(extractors.Anime) (extractors.Anime, error)
+	ParseAnime(*extractors.Anime) error
 	ParseEpisode(*extractors.Episode, string, string) error
 }
 
@@ -38,13 +38,14 @@ func (m *Manager) Search(name string) error {
 }
 
 func (m *Manager) ParseAnime(animeIndex int) error {
-	parsedAnime, err := m.Extractor.ParseAnime(m.FoundAnime[animeIndex])
+	//parsedAnime, err := m.Extractor.ParseAnime(m.FoundAnime[animeIndex])
+	anime := &m.FoundAnime[animeIndex]
+	err := m.Extractor.ParseAnime(anime)
 	if err != nil {
 		log.Printf("manager failed in parsing anime: %v\n", err)
 		return err
 	}
-	parsedAnime.Parsed = true
-	m.FoundAnime[animeIndex] = parsedAnime
+	anime.Parsed = true
 	return nil
 }
 
