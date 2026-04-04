@@ -100,9 +100,14 @@ func setAppFunctions(a *App) {
 		go func() {
 			time.Sleep(time.Millisecond * 500)
 			if a.SearchContainer.List.GetCurrentItem() == index {
-				a.Draw()
-				a.AnimeSettings.SetAnimeSettings(index)
-				a.Preview.SetImageURL("https://img.cdngos.com/anime/5e/5e146c0e398d3512268183")
+				selectedAnime := &a.Manager.FoundAnime[index]
+				if !selectedAnime.Parsed {
+					a.AnimeSettings.SetSpinner()
+					a.Preview.SetSpinner()
+					a.Manager.ParseAnime(index)
+				}
+				a.AnimeSettings.SetAnimeSettings(selectedAnime)
+				a.Preview.SetPreview(selectedAnime)
 			}
 		}()
 	})

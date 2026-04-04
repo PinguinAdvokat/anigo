@@ -1,8 +1,8 @@
 package containers
 
 import (
+	"anigo/internal/extractors"
 	"fmt"
-	"log"
 
 	"github.com/rivo/tview"
 )
@@ -43,30 +43,20 @@ func (a *AnimeSettings) setContent(prims []tview.Primitive) {
 	a.app.Draw()
 }
 
-func (a *AnimeSettings) SetAnimeSettings(index int) {
-	manager := a.app.GetManager()
+func (a *AnimeSettings) SetSpinner() {
+	a.setContent([]tview.Primitive{a.app.GetSpinner()})
+}
 
-	if index < 0 || index > len(manager.FoundAnime)-1 {
-		log.Printf("index %d out of range in GetAnimeInfo", index)
-		return
-	}
+func (a *AnimeSettings) SetError(err error) {
+	a.setContent([]tview.Primitive{NewErrorView(fmt.Sprintf("Ошибка при поиске: %v", err))})
+}
 
-	if len(manager.FoundAnime[index].AvailableVoiceover) == 0 {
-		a.setContent([]tview.Primitive{a.app.GetSpinner()})
-		go func() {
-			err := manager.ParseAnime(index)
-			if err != nil {
-				log.Printf("Failed get animeinfo: %v\n", err)
-				a.setContent([]tview.Primitive{NewErrorView(fmt.Sprintf("Ошибка при поиске: %v", err))})
-				return
-			}
-			a.Voiceover.SetOptions(manager.FoundAnime[index].AvailableVoiceover, nil).SetCurrentOption(0)
-			a.Player.SetOptions(manager.FoundAnime[index].AvailablePlayers, nil).SetCurrentOption(0)
-			a.setContent([]tview.Primitive{a.Voiceover, a.Player})
-		}()
-	} else {
-		a.Voiceover.SetOptions(manager.FoundAnime[index].AvailableVoiceover, nil)
-		a.Player.SetOptions(manager.FoundAnime[index].AvailablePlayers, nil)
-		a.setContent([]tview.Primitive{a.Voiceover, a.Player})
-	}
+func (a *AnimeSettings) SetAnimeSettings(anime *extractors.Anime) {
+	// if index < 0 || index > len(manager.FoundAnime)-1 {
+	// 	log.Printf("index %d out of range in GetAnimeInfo", index)
+	// 	return
+	// }
+	a.Voiceover.SetOptions(anime.AvailableVoiceover, nil).SetCurrentOption(0)
+	a.Player.SetOptions(anime.AvailablePlayers, nil).SetCurrentOption(0)
+	a.setContent([]tview.Primitive{a.Voiceover, a.Player})
 }

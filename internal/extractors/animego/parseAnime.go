@@ -42,6 +42,9 @@ var (
 
 	// Strip HTML tags.
 	reStripTags = regexp.MustCompile(`<[^>]+>`)
+
+	// Cover image URL from preload link: href="https://img.cdngos.com/anime/..."
+	reCoverURL = regexp.MustCompile(`<link\s+rel="preload"\s+as="image"[^>]*href="([^"]+)"`)
 )
 
 // ── Public API ───────────────────────────────────────────────────────────────
@@ -56,6 +59,7 @@ func (a *Animego) ParseAnime(anime *extractors.Anime) error {
 
 	// base anime info (voicecovers, players, episodes count)
 	parseBody(anime, body)
+	log.Printf("Cover URL %s", anime.CoverURL)
 
 	// get anime id
 	re := regexp.MustCompile(`\d+$`)
@@ -104,6 +108,30 @@ func (a *Animego) parseEpisodes(html string) []extractors.Episode {
 		})
 	}
 	return episodes
+}
+
+// getCoverURL extracts the anime cover image URL from the HTML page.
+// It looks for a preload link with rel="preload" and as="image".
+func getCoverURL(anime *extractors.Anime, body []byte) {
+	if m := reCoverURL.FindSubmatch(body); len(m) == 2 {
+		anime.CoverURL = string(m[1])
+		return
+	}
+
+	// Fallback: try to extract from JSON-LD structured data
+	if m := reLD.FindSubmatch(body); len(m) == 2 {
+		var ld ldSchema
+		if err := json.Unmarshal(m[1], &ld); err == nil && ld.Description != "" {
+			// Extract image URL from JSON-LD if preload link not found
+			type ldFull struct {
+				Image string `json:"image"`
+			}
+			var ldFullData ldFull
+			if err := json.Unmarshal(m[1], &ldFullData); err == nil {
+				anime.CoverURL = ldFullData.Image
+			}
+		}
+	}
 }
 
 // fetchURL performs an HTTP GET with browser-like headers.
@@ -161,6 +189,9 @@ func parseBody(anime *extractors.Anime, body []byte) {
 			anime.AvailableVoiceover = append(anime.AvailableVoiceover, name)
 		}
 	}
+
+	// ── Cover image URL ───────────────────────────────────────────────────
+	getCoverURL(anime, body)
 }
 
 // StripHTML removes HTML tags and collapses whitespace.

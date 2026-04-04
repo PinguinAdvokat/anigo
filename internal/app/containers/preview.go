@@ -1,6 +1,7 @@
 package containers
 
 import (
+	"anigo/internal/extractors"
 	"bytes"
 	"fmt"
 	"image"
@@ -12,6 +13,7 @@ import (
 	_ "image/jpeg"
 	_ "image/png"
 
+	"github.com/gdamore/tcell/v2"
 	"github.com/rivo/tview"
 	"golang.org/x/image/webp"
 )
@@ -41,18 +43,51 @@ func NewPreview(app controller, client *http.Client) *Preview {
 		AddItem(p.Cover, 0, 2, false).
 		AddItem(p.Description, 0, 1, false)
 
-	p.SetBoxResizeFunc(p.resize)
-	p.SetImageURL("https://img.cdngos.com/anime/69/69b1b245f1e79123493273")
-
-	p.Description.SetText("example text example text example text example text example text example text example text")
-
+	p.SetBoxResizeFunc(func() {
+		p.Flex.ResizeItem(p.Cover, p.getCoverWidth(), 1)
+	})
+	p.SetTitleColor(tcell.ColorYellow)
 	return p
 }
 
-func (p *Preview) resize() {
+func (p *Preview) SetPreview(anime *extractors.Anime) {
+	p.SetTitle(anime.Title)
+	if anime.Description != "" {
+		p.Description.SetText(anime.Description)
+	} else {
+		p.Description.SetText("нет описания")
+	}
+	p.Clear().
+		AddItem(nil, p.getCoverWidth(), 1, false).
+		AddItem(p.Description, 0, 1, false)
+
+	go func() {
+		if anime.CoverURL != "" {
+			p.SetImageURL(anime.CoverURL)
+			p.Clear().
+				AddItem(p.Cover, p.getCoverWidth(), 1, false).
+				AddItem(p.Description, 0, 1, false)
+		} else {
+			p.Clear().
+				AddItem(tview.NewTextView().SetText("нет фото").SetTextAlign(tview.AlignCenter), 10, 1, false).
+				AddItem(p.Description, 0, 1, false)
+		}
+	}()
+	if anime.CoverURL != "" {
+		go func() {
+			p.SetImageURL(anime.CoverURL)
+		}()
+	}
+}
+
+func (p *Preview) SetSpinner() {
+	p.Clear()
+	p.AddItem(p.app.GetSpinner(), 0, 1, false)
+}
+
+func (p *Preview) getCoverWidth() int {
 	_, _, _, height := p.Cover.GetRect()
-	height = max(int(float32(height)*1.5), 4)
-	p.Flex.ResizeItem(p.Cover, height, 1)
+	return max(int(float32(height)*1.5), 4)
 }
 
 func (p *Preview) SetImageURL(url string) {
@@ -62,7 +97,6 @@ func (p *Preview) SetImageURL(url string) {
 		return
 	}
 	p.Cover.SetImage(img).SetColors(tview.TrueColor)
-	p.resize()
 }
 
 func (p *Preview) loadFromURL(url string) (image.Image, error) {
