@@ -11,6 +11,9 @@
 *.log
 *.html
 
+json_parser.py
+anigo
+
 # Test binary, built with `go test -c`
 *.test
 

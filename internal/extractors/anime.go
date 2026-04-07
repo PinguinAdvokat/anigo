@@ -17,7 +17,7 @@ type Anime struct {
 
 type Episode struct {
 	Title     string
-	ID        string
+	URL       string
 	PlayerURL string
 	Links     map[string]string
 }

@@ -89,6 +89,13 @@ func (a *Animego) ParseAnime(anime *extractors.Anime) error {
 	// parsing episodes (name, id)
 	anime.Episodes = a.parseEpisodes(playerContent)
 
+	if len(anime.Episodes) == 0 {
+		anime.Episodes = append(anime.Episodes, extractors.Episode{
+			Title: anime.Title,
+			URL:   fmt.Sprintf("https://animego.me/player/%d", num),
+		})
+	}
+
 	return nil
 }
 
@@ -98,13 +105,10 @@ func (a *Animego) parseEpisodes(html string) []extractors.Episode {
 
 	episodes := make([]extractors.Episode, 0, len(matches))
 	for _, m := range matches {
-		id, err := strconv.Atoi(m[2])
-		if err != nil {
-			continue
-		}
+		id := m[2]
 		episodes = append(episodes, extractors.Episode{
 			Title: m[1],
-			ID:    strconv.Itoa(id),
+			URL:   fmt.Sprintf("https://animego.me/player/videos/%s", id),
 		})
 	}
 	return episodes

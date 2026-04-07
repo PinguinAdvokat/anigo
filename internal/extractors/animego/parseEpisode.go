@@ -23,7 +23,7 @@ var (
 func (a *Animego) ParseEpisode(episode *extractors.Episode, player string, voicecover string) error {
 	op := "animego.ParseEpisode"
 
-	html, err := a.getEpisodeHTML(episode.ID)
+	html, err := a.getEpisodeHTML(episode.URL)
 	if err != nil {
 		return err
 	}
@@ -44,10 +44,10 @@ func (a *Animego) ParseEpisode(episode *extractors.Episode, player string, voice
 	return nil
 }
 
-func (a *Animego) getEpisodeHTML(id string) ([]byte, error) {
+func (a *Animego) getEpisodeHTML(url string) ([]byte, error) {
 	op := "animego.ParseEpisode.getEpisodeHTML"
 
-	req, err := http.NewRequest(http.MethodGet, fmt.Sprintf("https://animego.me/player/videos/%s", id), nil)
+	req, err := http.NewRequest(http.MethodGet, url, nil)
 	if err != nil {
 		log.Printf("error in creating request (%s): %v\n", op, err)
 		return nil, err
