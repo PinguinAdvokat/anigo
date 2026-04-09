@@ -89,7 +89,6 @@ func (p *Preview) getCoverWidth() int {
 	_, _, _, height := p.Cover.GetRect()
 	_, _, maxWidth, _ := p.Flex.GetRect()
 	maxWidth = int(maxWidth / 2)
-	log.Print(maxWidth)
 	return min(max(int(float32(height)*1.5), 4), maxWidth)
 }
 

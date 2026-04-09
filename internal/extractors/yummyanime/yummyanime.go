@@ -1,20 +1,17 @@
 package yummyanime
 
 import (
-	"anigo/internal/parsers/kodik"
 	"net/http"
 )
 
 type YummyAnime struct {
-	BaseURL     string
-	httpClient  *http.Client
-	kodikParser *kodik.Kodik
+	BaseURL    string
+	httpClient *http.Client
 }
 
-func NewYummyAnime(kodikParser *kodik.Kodik, httpClient *http.Client) *YummyAnime {
+func New(httpClient *http.Client) *YummyAnime {
 	return &YummyAnime{
-		BaseURL:     "https://api.yani.tv",
-		httpClient:  httpClient,
-		kodikParser: kodikParser,
+		BaseURL:    "https://api.yani.tv",
+		httpClient: httpClient,
 	}
 }

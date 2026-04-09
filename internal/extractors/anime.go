@@ -8,14 +8,12 @@ type Anime struct {
 	URL                string
 	AvailableVoiceover []string
 	AvailablePlayers   []string
-	SelectedVoiceover  []string
-	SelectedSource     []string
 	EpisodesCount      int
 	Episodes           []Episode
 	Parsed             bool
 
 	//[player][voiceover]episode
-	YummyApisodesRaw map[string]map[string][]Episode
+	YummEpisodesRaw map[string]map[string][]Episode
 }
 
 type Episode struct {

@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
-	"strconv"
 )
 
 type ApiEpisode struct {
@@ -22,12 +21,12 @@ type data struct {
 }
 
 func (y *YummyAnime) ParseAnime(anime *extractors.Anime) error {
-	req, err := http.NewRequest("GET", anime.URL, nil)
+	req, err := http.NewRequest("GET", anime.URL+"/videos", nil)
 	if err != nil {
 		log.Printf("YummyAnime ParseAnime request creation error: %v", err)
 		return err
 	}
-	req.Header.Set("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36")
+	req.Header.Set("Host", "api.yani.tv")
 	req.Header.Set("Accept-Language", "ru")
 
 	resp, err := y.httpClient.Do(req)
@@ -51,18 +50,36 @@ func (y *YummyAnime) ParseAnime(anime *extractors.Anime) error {
 		return err
 	}
 
+	episodes := make(map[string]map[string][]extractors.Episode)
+
+	maxIndex := 0
 	for _, apiEpisode := range apiResponse.Episodes {
-		number, err := strconv.Atoi(apiEpisode.Number)
-		if err != nil {
-			log.Printf("error in setting yummy episodes: %v", err)
-			continue
+		player := apiEpisode.Data.Player
+		voice := apiEpisode.Data.Voicecover
+
+		// Инициализируем вложенную структуру если нужно
+		if episodes[player] == nil {
+			episodes[player] = make(map[string][]extractors.Episode)
 		}
-		anime.YummyApisodesRaw[apiEpisode.Data.Player][apiEpisode.Data.Voicecover][number-1] = extractors.Episode{
+		if episodes[player][voice] == nil {
+			episodes[player][voice] = []extractors.Episode{}
+		}
+
+		episodes[player][voice] = append(episodes[player][voice], extractors.Episode{
 			PlayerURL: apiEpisode.IframeURL,
+		})
+
+		if len(episodes[player][voice]) > maxIndex {
+			maxIndex = len(episodes[player][voice])
 		}
 	}
+	anime.YummEpisodesRaw = episodes
 
-	uniquePlayers, uniqueVoicecovers := getUniqueLists(anime.YummyApisodesRaw)
+	for _ = range maxIndex {
+		anime.Episodes = append(anime.Episodes, extractors.Episode{})
+	}
+
+	uniquePlayers, uniqueVoicecovers := getUniqueLists(anime.YummEpisodesRaw)
 	anime.AvailablePlayers = uniquePlayers
 	anime.AvailableVoiceover = uniqueVoicecovers
 

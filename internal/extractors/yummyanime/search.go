@@ -4,8 +4,10 @@ import (
 	"anigo/internal/extractors"
 	"encoding/json"
 	"fmt"
+	"io"
 	"log"
 	"net/http"
+	"net/url"
 )
 
 type ApiAnime struct {
@@ -21,13 +23,16 @@ type ApiAnime struct {
 }
 
 func (y *YummyAnime) Search(name string) ([]extractors.Anime, error) {
-	req, err := http.NewRequest("GET", y.BaseURL+"/search?q="+name, nil)
+	encoded := url.QueryEscape(name)
+	url := fmt.Sprintf("%s/search?q=%s", y.BaseURL, encoded)
+	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		log.Printf("YummyAnime search request creation error: %v", err)
 		return nil, err
 	}
-	req.Header.Set("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36")
-	req.Header.Set("Accept-Language", "ru")
+	req.Host = "api.yani.tv"
+	req.Header.Set("User-Agent", "PostmanRuntime/7.49.1")
+	req.Header.Set("Acept-Language", "ru")
 
 	resp, err := y.httpClient.Do(req)
 	if err != nil {
@@ -38,7 +43,12 @@ func (y *YummyAnime) Search(name string) ([]extractors.Anime, error) {
 
 	if resp.StatusCode != http.StatusOK {
 		log.Printf("YummyAnime search HTTP error: %d", resp.StatusCode)
-		return nil, err
+		body, _ := io.ReadAll(resp.Body)
+		log.Printf("returned body: %v", string(body))
+		if err != nil {
+			log.Print(err)
+		}
+		return nil, fmt.Errorf("YummyAnime search HTTP error: %d", resp.StatusCode)
 	}
 
 	var apiResponse struct {

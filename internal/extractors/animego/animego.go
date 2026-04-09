@@ -1,14 +1,12 @@
 package animego
 
 import (
-	"anigo/internal/parsers/kodik"
 	"net/http"
 )
 
 type Animego struct {
-	BaseURL     string
-	httpClient  *http.Client
-	kodikParser *kodik.Kodik
+	BaseURL    string
+	httpClient *http.Client
 }
 
 func New(httpClient *http.Client) *Animego {
