@@ -29,7 +29,7 @@ jobs:
           GOOS=${{ matrix.goos }} \
           GOARCH=${{ matrix.goarch }} \
           CGO_ENABLED=0 \
-          go build -o dist/anigo-${{ matrix.goos }}-${{ matrix.goarch }}${{ matrix.goos == 'windows' && '.exe' || '' }} ./cmd/anigo/main.go
+          go build -ldflags "-s -w" -o dist/anigo-${{ matrix.goos }}-${{ matrix.goarch }}${{ matrix.goos == 'windows' && '.exe' || '' }} ./cmd/anigo/main.go
 
       - name: Upload to Release
         uses: svenstaro/upload-release-action@v2
