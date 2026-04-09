@@ -13,6 +13,9 @@ type Anime struct {
 	EpisodesCount      int
 	Episodes           []Episode
 	Parsed             bool
+
+	//[player][voiceover]episode
+	YummyApisodesRaw map[string]map[string][]Episode
 }
 
 type Episode struct {

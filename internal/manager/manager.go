@@ -38,7 +38,6 @@ func (m *Manager) Search(name string) error {
 }
 
 func (m *Manager) ParseAnime(animeIndex int) error {
-	//parsedAnime, err := m.Extractor.ParseAnime(m.FoundAnime[animeIndex])
 	anime := &m.FoundAnime[animeIndex]
 	err := m.Extractor.ParseAnime(anime)
 	if err != nil {
