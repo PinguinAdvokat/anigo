@@ -26,8 +26,9 @@ type App struct {
 
 	Pages *Pages
 
-	Manager *manager.Manager
-	Mpv     *mpv.Mpv
+	ExtractorsSelector *containers.ExtractorsSelector
+	Manager            *manager.Manager
+	Mpv                *mpv.Mpv
 }
 
 func New(manager *manager.Manager, mpv *mpv.Mpv, client *http.Client) *App {
@@ -51,6 +52,7 @@ func New(manager *manager.Manager, mpv *mpv.Mpv, client *http.Client) *App {
 	a.EpisodeSelect = containers.NewEpisodeSelect(a)
 	a.Quality = containers.NewQuality(a)
 	a.Preview = containers.NewPreview(a, client)
+	a.ExtractorsSelector = containers.NewExtractorSelector(a)
 
 	// setup functions
 	setAppFunctions(a)
@@ -59,6 +61,18 @@ func New(manager *manager.Manager, mpv *mpv.Mpv, client *http.Client) *App {
 	a.SetRoot(a.Pages, true)
 	a.SetFocus(a.Pages)
 	return a
+}
+
+func (a *App) Clear() {
+	a.SearchContainer.List.Clear()
+	a.EpisodeSelect.EpisodesList.Clear()
+	a.Preview.Description.SetTitle("Описание")
+	a.Preview.Description.Clear()
+	a.Preview.Cover.SetImage(nil)
+	a.AnimeSettings.Player.SetOptions([]string{}, nil)
+	a.AnimeSettings.Voiceover.SetOptions([]string{}, nil)
+
+	a.Pages.SwitchToPage("SearchFlex")
 }
 
 func (a *App) GetSpinner() *tview.TextView {

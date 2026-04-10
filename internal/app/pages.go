@@ -15,21 +15,27 @@ type Pages struct {
 func setupPages(a *App) *Pages {
 	// pages
 	SearchFlexPage := tview.NewFlex().SetDirection(tview.FlexColumn).
-		AddItem(a.Menu, 14, 1, true).
+		AddItem(tview.NewFlex().SetDirection(tview.FlexRow).
+			AddItem(a.Menu, 6, 1, true).
+			AddItem(a.ExtractorsSelector, 0, 1, true), 14, 1, true).
 		AddItem(a.SearchContainer, 0, 1, true).
 		AddItem(tview.NewFlex().SetDirection(tview.FlexRow).
 			AddItem(a.Preview, 0, 1, true).
 			AddItem(a.AnimeSettings, 5, 1, true), 0, 1, true)
 
 	libraryPage := tview.NewFlex().SetDirection(tview.FlexColumn).
-		AddItem(a.Menu, 14, 1, true).
+		AddItem(tview.NewFlex().SetDirection(tview.FlexRow).
+			AddItem(a.Menu, 6, 1, true).
+			AddItem(a.ExtractorsSelector, 0, 1, true), 14, 1, true).
 		AddItem(a.Library, 0, 1, true).
 		AddItem(tview.NewFlex().SetDirection(tview.FlexRow).
 			AddItem(a.Preview, 0, 1, true).
 			AddItem(a.AnimeSettings, 5, 1, true), 0, 1, true)
 
 	animePage := tview.NewFlex().SetDirection(tview.FlexColumn).
-		AddItem(a.Menu, 14, 1, true).
+		AddItem(tview.NewFlex().SetDirection(tview.FlexRow).
+			AddItem(a.Menu, 6, 1, true).
+			AddItem(a.ExtractorsSelector, 0, 1, true), 14, 1, true).
 		AddItem(a.EpisodeSelect, 0, 1, true).
 		AddItem(tview.NewFlex().SetDirection(tview.FlexRow).
 			AddItem(a.Preview, 0, 1, true).

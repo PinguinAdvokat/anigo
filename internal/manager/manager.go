@@ -2,8 +2,11 @@ package manager
 
 import (
 	"anigo/internal/extractors"
+	"anigo/internal/extractors/animego"
+	"anigo/internal/extractors/yummyanime"
 	"anigo/internal/parsers/kodik"
 	"log"
+	"net/http"
 	"sync"
 )
 
@@ -13,15 +16,36 @@ type Extractor interface {
 	ParseEpisode(*extractors.Episode, string, string) error
 }
 
+type ExtractorFactory struct {
+	httpClient *http.Client
+}
+
+func (e *ExtractorFactory) New(kind string) Extractor {
+	switch kind {
+	case "animego":
+		return animego.New(e.httpClient)
+	case "yummyanime":
+		return yummyanime.New(e.httpClient)
+	default:
+		return animego.New(e.httpClient)
+	}
+}
+
 type Manager struct {
 	mu          sync.RWMutex
+	factory     ExtractorFactory
 	Extractor   Extractor
 	KodikParser *kodik.Kodik
 	FoundAnime  []extractors.Anime
 }
 
-func New(extractor Extractor, kodikParser *kodik.Kodik) *Manager {
-	return &Manager{Extractor: extractor, KodikParser: kodikParser}
+func New(ExtractorKind string, kodikParser *kodik.Kodik, httpClient *http.Client) *Manager {
+	m := &Manager{
+		factory:     ExtractorFactory{httpClient: httpClient},
+		KodikParser: kodikParser,
+	}
+	m.SetExtractor(ExtractorKind)
+	return m
 }
 
 func (m *Manager) Search(name string) error {
@@ -61,4 +85,11 @@ func (m *Manager) ParseEpisode(animeIndex, episodeIndex int, player, voicecover 
 	}
 	episode.Links = links
 	return nil
+}
+
+func (m *Manager) SetExtractor(kind string) {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+	m.FoundAnime = nil
+	m.Extractor = m.factory.New(kind)
 }

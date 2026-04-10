@@ -8,6 +8,7 @@ import (
 
 type controller interface {
 	Draw() *tview.Application
+	Clear()
 
 	GetSpinner() *tview.TextView
 	GetManager() *manager.Manager
