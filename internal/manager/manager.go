@@ -45,7 +45,6 @@ func (m *Manager) ParseAnime(animeIndex int) error {
 		return err
 	}
 	anime.Parsed = true
-	log.Printf("parsed anime struct: %+v\n", anime)
 	return nil
 }
 

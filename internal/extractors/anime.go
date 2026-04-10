@@ -11,9 +11,6 @@ type Anime struct {
 	EpisodesCount      int
 	Episodes           []Episode
 	Parsed             bool
-
-	//[player][voiceover]episode
-	YummEpisodesRaw map[string]map[string][]Episode
 }
 
 type Episode struct {
@@ -21,6 +18,9 @@ type Episode struct {
 	URL       string
 	PlayerURL string
 	Links     map[string]string
+
+	// special for yummyanime. [player][voicecover]playerurl
+	AllVideos map[string]map[string]string
 }
 
 var (

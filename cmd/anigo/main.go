@@ -3,7 +3,7 @@ package main
 import (
 	"anigo/internal/app"
 	"anigo/internal/cache"
-	"anigo/internal/extractors/animego"
+	"anigo/internal/extractors/yummyanime"
 	"anigo/internal/initApp"
 	"anigo/internal/manager"
 	"anigo/internal/mpv"
@@ -32,10 +32,10 @@ func main() {
 	cache := cache.New(appDir)
 	httpClient := &http.Client{Timeout: 3 * time.Second}
 	kodikParser := kodik.New(httpClient, cache)
-	animego := animego.New(httpClient)
-	// yummyanime := yummyanime.New(httpClient)
+	// animego := animego.New(httpClient)
+	yummyanime := yummyanime.New(httpClient)
 	mpv := mpv.New()
-	manager := manager.New(animego, kodikParser)
+	manager := manager.New(yummyanime, kodikParser)
 
 	app := app.New(manager, mpv, httpClient)
 	if err := app.EnableMouse(true).EnablePaste(true).Run(); err != nil {

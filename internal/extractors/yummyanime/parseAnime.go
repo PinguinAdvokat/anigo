@@ -5,6 +5,10 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+	"slices"
+	"sort"
+	"strconv"
+	"strings"
 )
 
 type ApiEpisode struct {
@@ -50,65 +54,85 @@ func (y *YummyAnime) ParseAnime(anime *extractors.Anime) error {
 		return err
 	}
 
-	episodes := make(map[string]map[string][]extractors.Episode)
+	// episodes := make(map[string]map[string][]extractors.Episode)
 
-	maxIndex := 0
+	// maxIndex := 0
+	// for _, apiEpisode := range apiResponse.Episodes {
+	// 	player := apiEpisode.Data.Player
+	// 	voice := apiEpisode.Data.Voicecover
+
+	// 	// Инициализируем вложенную структуру если нужно
+	// 	if episodes[player] == nil {
+	// 		episodes[player] = make(map[string][]extractors.Episode)
+	// 	}
+	// 	if episodes[player][voice] == nil {
+	// 		episodes[player][voice] = []extractors.Episode{}
+	// 	}
+
+	// 	episodes[player][voice] = append(episodes[player][voice], extractors.Episode{
+	// 		PlayerURL: apiEpisode.IframeURL,
+	// 	})
+
+	// 	if len(episodes[player][voice]) > maxIndex {
+	// 		maxIndex = len(episodes[player][voice])
+	// 	}
+	// }
+	// anime.YummEpisodesRaw = episodes
+
+	// for _ = range maxIndex {
+	// 	anime.Episodes = append(anime.Episodes, extractors.Episode{})
+	// }
+
+	// uniquePlayers, uniqueVoicecovers := getUniqueLists(anime.YummEpisodesRaw)
+	// anime.AvailablePlayers = uniquePlayers
+	// anime.AvailableVoiceover = uniqueVoicecovers
+
+	// Шаг 1: Группировка в map[int]map[string]map[string]string
+	temp := make(map[int]map[string]map[string]string)
+	uniquePlayers := []string{}
+	uniqueVoicecovers := []string{}
 	for _, apiEpisode := range apiResponse.Episodes {
+		num, _ := strconv.Atoi(apiEpisode.Number)
 		player := apiEpisode.Data.Player
 		voice := apiEpisode.Data.Voicecover
+		url := apiEpisode.IframeURL
 
-		// Инициализируем вложенную структуру если нужно
-		if episodes[player] == nil {
-			episodes[player] = make(map[string][]extractors.Episode)
+		if !slices.Contains(uniquePlayers, player) {
+			uniquePlayers = append(uniquePlayers, player)
 		}
-		if episodes[player][voice] == nil {
-			episodes[player][voice] = []extractors.Episode{}
+		if !slices.Contains(uniqueVoicecovers, voice) {
+			uniqueVoicecovers = append(uniqueVoicecovers, voice)
+		}
+		if !strings.HasPrefix(url, "https:") {
+			url = "https:" + url
 		}
 
-		episodes[player][voice] = append(episodes[player][voice], extractors.Episode{
-			PlayerURL: apiEpisode.IframeURL,
+		if temp[num] == nil {
+			temp[num] = make(map[string]map[string]string)
+		}
+		if temp[num][player] == nil {
+			temp[num][player] = make(map[string]string)
+		}
+		temp[num][player][voice] = url
+	}
+
+	// Шаг 2: Создание списка Episode
+	var episodes []extractors.Episode
+	episodeNums := make([]int, 0, len(temp))
+	for num := range temp {
+		episodeNums = append(episodeNums, num)
+	}
+	sort.Ints(episodeNums) // Сортировка по номеру серии
+
+	for _, num := range episodeNums {
+		episodes = append(episodes, extractors.Episode{
+			AllVideos: temp[num],
 		})
-
-		if len(episodes[player][voice]) > maxIndex {
-			maxIndex = len(episodes[player][voice])
-		}
-	}
-	anime.YummEpisodesRaw = episodes
-
-	for _ = range maxIndex {
-		anime.Episodes = append(anime.Episodes, extractors.Episode{})
 	}
 
-	uniquePlayers, uniqueVoicecovers := getUniqueLists(anime.YummEpisodesRaw)
+	anime.Episodes = episodes
 	anime.AvailablePlayers = uniquePlayers
 	anime.AvailableVoiceover = uniqueVoicecovers
 
 	return nil
-}
-
-func getUniqueLists[K1 comparable, K2 comparable, V any](
-	data map[K1]map[K2]V,
-) ([]K1, []K2) {
-	keysOuter := make([]K1, 0)
-	keysInner := make(map[K2]struct{})
-
-	// уникальные внешние ключи
-	for kOuter := range data {
-		keysOuter = append(keysOuter, kOuter)
-	}
-
-	// уникальные внутренние ключи
-	for _, innerMap := range data {
-		for kInner := range innerMap {
-			keysInner[kInner] = struct{}{}
-		}
-	}
-
-	// переводим внутренние ключи в срез
-	keysInnerSlice := make([]K2, 0, len(keysInner))
-	for k := range keysInner {
-		keysInnerSlice = append(keysInnerSlice, k)
-	}
-
-	return keysOuter, keysInnerSlice
 }
