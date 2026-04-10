@@ -3,6 +3,7 @@ package animego
 import (
 	"anigo/internal/extractors"
 	"regexp"
+	"slices"
 )
 
 type Response struct {
@@ -26,20 +27,11 @@ func (a *Animego) FetchPlayers(content string) ([]string, error) {
 		name := m[1]
 		if !seen[name] {
 			seen[name] = true
-			if contains(extractors.AvailablePlayers, name) {
+			if slices.Contains(extractors.AvailablePlayers, name) {
 				players = append(players, name)
 			}
 		}
 	}
 
 	return players, nil
-}
-
-func contains(slice []string, item string) bool {
-	for _, s := range slice {
-		if s == item {
-			return true
-		}
-	}
-	return false
 }

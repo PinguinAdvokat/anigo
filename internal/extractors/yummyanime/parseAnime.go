@@ -54,55 +54,22 @@ func (y *YummyAnime) ParseAnime(anime *extractors.Anime) error {
 		return err
 	}
 
-	// episodes := make(map[string]map[string][]extractors.Episode)
-
-	// maxIndex := 0
-	// for _, apiEpisode := range apiResponse.Episodes {
-	// 	player := apiEpisode.Data.Player
-	// 	voice := apiEpisode.Data.Voicecover
-
-	// 	// Инициализируем вложенную структуру если нужно
-	// 	if episodes[player] == nil {
-	// 		episodes[player] = make(map[string][]extractors.Episode)
-	// 	}
-	// 	if episodes[player][voice] == nil {
-	// 		episodes[player][voice] = []extractors.Episode{}
-	// 	}
-
-	// 	episodes[player][voice] = append(episodes[player][voice], extractors.Episode{
-	// 		PlayerURL: apiEpisode.IframeURL,
-	// 	})
-
-	// 	if len(episodes[player][voice]) > maxIndex {
-	// 		maxIndex = len(episodes[player][voice])
-	// 	}
-	// }
-	// anime.YummEpisodesRaw = episodes
-
-	// for _ = range maxIndex {
-	// 	anime.Episodes = append(anime.Episodes, extractors.Episode{})
-	// }
-
-	// uniquePlayers, uniqueVoicecovers := getUniqueLists(anime.YummEpisodesRaw)
-	// anime.AvailablePlayers = uniquePlayers
-	// anime.AvailableVoiceover = uniqueVoicecovers
-
-	// Шаг 1: Группировка в map[int]map[string]map[string]string
 	temp := make(map[int]map[string]map[string]string)
 	uniquePlayers := []string{}
 	uniqueVoicecovers := []string{}
 	for _, apiEpisode := range apiResponse.Episodes {
 		num, _ := strconv.Atoi(apiEpisode.Number)
-		player := apiEpisode.Data.Player
-		voice := apiEpisode.Data.Voicecover
+		player := strings.Replace(apiEpisode.Data.Player, "Плеер ", "", 1)
+		voice := strings.Replace(apiEpisode.Data.Voicecover, "Озвучка ", "", 1)
 		url := apiEpisode.IframeURL
 
-		if !slices.Contains(uniquePlayers, player) {
+		if !slices.Contains(uniquePlayers, player) && slices.Contains(extractors.AvailablePlayers, player) {
 			uniquePlayers = append(uniquePlayers, player)
 		}
 		if !slices.Contains(uniqueVoicecovers, voice) {
 			uniqueVoicecovers = append(uniqueVoicecovers, voice)
 		}
+
 		if !strings.HasPrefix(url, "https:") {
 			url = "https:" + url
 		}
