@@ -9,7 +9,11 @@ import (
 
 func (m *Mpv) Play(url string) error {
 	if m.isPlaying {
-		m.Add(url)
+		err := m.Add(url)
+		if err != nil {
+			log.Printf("error in mpv: %v", err)
+			return err
+		}
 		return nil
 	}
 	cmd := exec.Command(
@@ -23,6 +27,7 @@ func (m *Mpv) Play(url string) error {
 	cmd.Stderr = io.Discard
 
 	if err := cmd.Start(); err != nil {
+		log.Printf("error in mpv: %v", err)
 		return err
 	}
 	m.isPlaying = true

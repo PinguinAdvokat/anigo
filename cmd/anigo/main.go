@@ -29,10 +29,10 @@ func main() {
 
 	httpClient := &http.Client{Timeout: 3 * time.Second}
 	kodikParser := kodik.New(httpClient)
-	manager := manager.New("", kodikParser, httpClient)
 	mpv := mpv.New()
+	manager := manager.New("", kodikParser, httpClient, mpv)
 
-	app := app.New(manager, mpv, httpClient)
+	app := app.New(manager, httpClient)
 	if err := app.EnableMouse(true).EnablePaste(true).Run(); err != nil {
 		panic(err)
 	}

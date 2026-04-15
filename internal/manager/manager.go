@@ -4,10 +4,12 @@ import (
 	"anigo/internal/extractors"
 	"anigo/internal/extractors/animego"
 	"anigo/internal/extractors/yummyanime"
+	"anigo/internal/mpv"
 	"anigo/internal/parsers/kodik"
 	"log"
 	"net/http"
 	"sync"
+	"time"
 )
 
 type Extractor interface {
@@ -37,12 +39,14 @@ type Manager struct {
 	Extractor   Extractor
 	KodikParser *kodik.Kodik
 	FoundAnime  []extractors.Anime
+	Mpv         *mpv.Mpv
 }
 
-func New(ExtractorKind string, kodikParser *kodik.Kodik, httpClient *http.Client) *Manager {
+func New(ExtractorKind string, kodikParser *kodik.Kodik, httpClient *http.Client, mpv *mpv.Mpv) *Manager {
 	m := &Manager{
 		factory:     ExtractorFactory{httpClient: httpClient},
 		KodikParser: kodikParser,
+		Mpv:         mpv,
 	}
 	m.SetExtractor(ExtractorKind)
 	return m
@@ -85,6 +89,20 @@ func (m *Manager) ParseEpisode(animeIndex, episodeIndex int, player, voicecover 
 	}
 	episode.Links = links
 	return nil
+}
+
+func (m *Manager) PlayEpisode(animeIdx, episodeIdx int, quality string) {
+	anime := m.FoundAnime[animeIdx]
+	go func() {
+		var url string
+		for i := episodeIdx; i < len(anime.Episodes); i++ {
+			m.ParseEpisode(animeIdx, i)
+			url = anime.Episodes[i].Links[quality]
+			log.Printf("url for playlist: %s", url)
+			m.Mpv.Play(url)
+			time.Sleep(time.Second * 3)
+		}
+	}()
 }
 
 func (m *Manager) SetExtractor(kind string) {

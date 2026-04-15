@@ -3,8 +3,6 @@ package app
 import (
 	"anigo/internal/app/containers"
 	"anigo/internal/manager"
-	"anigo/internal/mpv"
-	"log"
 	"net/http"
 	"time"
 
@@ -28,10 +26,9 @@ type App struct {
 
 	ExtractorsSelector *containers.ExtractorsSelector
 	Manager            *manager.Manager
-	Mpv                *mpv.Mpv
 }
 
-func New(manager *manager.Manager, mpv *mpv.Mpv, client *http.Client) *App {
+func New(manager *manager.Manager, client *http.Client) *App {
 	a := &App{
 		Application: tview.NewApplication(),
 
@@ -44,7 +41,6 @@ func New(manager *manager.Manager, mpv *mpv.Mpv, client *http.Client) *App {
 		Library:         containers.NewLibrary(),
 
 		Manager: manager,
-		Mpv:     mpv,
 	}
 	a.Spinner = containers.NewSpinner(a)
 	a.SearchContainer = containers.NewSearch(a)
@@ -158,10 +154,7 @@ func setAppFunctions(a *App) {
 	// enter
 	a.EpisodeSelect.EpisodesList.SetSelectedFunc(func(i int, s1, s2 string, r rune) {
 		if len(a.Manager.FoundAnime[a.GetSelectedAnime()].Episodes[i].Links) != 0 && a.EpisodeSelect.EpisodesList.GetCurrentItem() == i {
-			err := a.Mpv.Play(a.Manager.FoundAnime[a.GetSelectedAnime()].Episodes[i].Links[a.Quality.GetCurrentOption()])
-			if err != nil {
-				log.Printf("error in start mpv: %v", err)
-			}
+			a.Manager.PlayEpisode(a.GetSelectedAnime(), i, a.Quality.GetCurrentOption())
 		}
 	})
 }
