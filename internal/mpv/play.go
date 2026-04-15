@@ -10,7 +10,7 @@ import (
 func (m *Mpv) Play(url string) error {
 	if m.isPlaying {
 		m.Add(url)
-		return fmt.Errorf("mpv player already playing video")
+		return nil
 	}
 	cmd := exec.Command(
 		"mpv",

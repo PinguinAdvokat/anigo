@@ -2,7 +2,6 @@ package main
 
 import (
 	"anigo/internal/app"
-	"anigo/internal/cache"
 	"anigo/internal/initApp"
 	"anigo/internal/manager"
 	"anigo/internal/mpv"
@@ -28,9 +27,8 @@ func main() {
 	defer logFile.Close()
 	log.SetOutput(logFile)
 
-	cache := cache.New(appDir)
 	httpClient := &http.Client{Timeout: 3 * time.Second}
-	kodikParser := kodik.New(httpClient, cache)
+	kodikParser := kodik.New(httpClient)
 	manager := manager.New("", kodikParser, httpClient)
 	mpv := mpv.New()
 
