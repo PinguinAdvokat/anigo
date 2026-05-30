@@ -1,4 +1,4 @@
-module anigo
+module github.com/PinguinAdvokat/anigo
 
 go 1.25.5
 
