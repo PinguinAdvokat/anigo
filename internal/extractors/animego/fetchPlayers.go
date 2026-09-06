@@ -1,7 +1,7 @@
 package animego
 
 import (
-	"anigo/internal/extractors"
+	"github.com/PinguinAdvokat/anigo/internal/extractors"
 	"regexp"
 	"slices"
 )

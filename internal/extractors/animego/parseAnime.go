@@ -1,9 +1,9 @@
 package animego
 
 import (
-	"anigo/internal/extractors"
 	"encoding/json"
 	"fmt"
+	"github.com/PinguinAdvokat/anigo/internal/extractors"
 	"io"
 	"log"
 	"net/http"

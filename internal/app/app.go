@@ -1,9 +1,9 @@
 package app
 
 import (
-	"anigo/internal/app/containers"
-	"anigo/internal/manager"
-	"anigo/internal/mpv"
+	"github.com/PinguinAdvokat/anigo/internal/app/containers"
+	"github.com/PinguinAdvokat/anigo/internal/manager"
+	"github.com/PinguinAdvokat/anigo/internal/mpv"
 	"log"
 	"net/http"
 	"time"

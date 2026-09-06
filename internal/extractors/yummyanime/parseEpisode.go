@@ -1,7 +1,7 @@
 package yummyanime
 
 import (
-	"anigo/internal/extractors"
+	"github.com/PinguinAdvokat/anigo/internal/extractors"
 	"log"
 )
 

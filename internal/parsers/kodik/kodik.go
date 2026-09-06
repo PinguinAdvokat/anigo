@@ -1,7 +1,7 @@
 package kodik
 
 import (
-	"anigo/internal/cache"
+	"github.com/PinguinAdvokat/anigo/internal/cache"
 	"net/http"
 )
 

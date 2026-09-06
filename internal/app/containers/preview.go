@@ -1,9 +1,9 @@
 package containers
 
 import (
-	"anigo/internal/extractors"
 	"bytes"
 	"fmt"
+	"github.com/PinguinAdvokat/anigo/internal/extractors"
 	"image"
 	"io"
 	"log"

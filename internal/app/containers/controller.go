@@ -1,7 +1,7 @@
 package containers
 
 import (
-	"anigo/internal/manager"
+	"github.com/PinguinAdvokat/anigo/internal/manager"
 
 	"github.com/rivo/tview"
 )

@@ -1,8 +1,8 @@
 package yummyanime
 
 import (
-	"anigo/internal/extractors"
 	"encoding/json"
+	"github.com/PinguinAdvokat/anigo/internal/extractors"
 	"log"
 	"net/http"
 	"slices"

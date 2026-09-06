@@ -1,17 +1,18 @@
 package main
 
 import (
-	"anigo/internal/app"
-	"anigo/internal/cache"
-	"anigo/internal/initApp"
-	"anigo/internal/manager"
-	"anigo/internal/mpv"
-	"anigo/internal/parsers/kodik"
 	"flag"
 	"log"
 	"net/http"
 	"path/filepath"
 	"time"
+
+	"github.com/PinguinAdvokat/anigo/internal/app"
+	"github.com/PinguinAdvokat/anigo/internal/cache"
+	"github.com/PinguinAdvokat/anigo/internal/initApp"
+	"github.com/PinguinAdvokat/anigo/internal/manager"
+	"github.com/PinguinAdvokat/anigo/internal/mpv"
+	"github.com/PinguinAdvokat/anigo/internal/parsers/kodik"
 )
 
 func main() {

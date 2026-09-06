@@ -1,8 +1,8 @@
 package containers
 
 import (
-	"anigo/internal/extractors"
 	"fmt"
+	"github.com/PinguinAdvokat/anigo/internal/extractors"
 
 	"github.com/rivo/tview"
 )

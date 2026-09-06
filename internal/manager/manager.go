@@ -1,10 +1,10 @@
 package manager
 
 import (
-	"anigo/internal/extractors"
-	"anigo/internal/extractors/animego"
-	"anigo/internal/extractors/yummyanime"
-	"anigo/internal/parsers/kodik"
+	"github.com/PinguinAdvokat/anigo/internal/extractors"
+	"github.com/PinguinAdvokat/anigo/internal/extractors/animego"
+	"github.com/PinguinAdvokat/anigo/internal/extractors/yummyanime"
+	"github.com/PinguinAdvokat/anigo/internal/parsers/kodik"
 	"log"
 	"net/http"
 	"sync"
