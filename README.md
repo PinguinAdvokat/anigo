@@ -18,9 +18,7 @@
 ### Сборка из исходников
 
 ```bash
-git clone https://github.com/PinguinAdvokat/anigo.git
-cd anigo
-go build ./cmd/...
+go install github.com/PinguinAdvokat/anigo/cmd/anigo
 ```
 
 Требуется Go 1.25+.
